@@ -1,0 +1,3 @@
+# Preserve vendored sources byte-for-byte; integrity is checked by skills.lock.json.
+.agents/skills/security-best-practices/** whitespace=-blank-at-eol
+.agents/skills/security-threat-model/** whitespace=-blank-at-eol

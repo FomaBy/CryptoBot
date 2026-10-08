@@ -6,8 +6,8 @@
 
 Репозиторий: [FomaBy/CryptoBot](https://github.com/FomaBy/CryptoBot). Планируемый интерфейс: `https://aistat.app/bot`; публикация ещё не выполнялась.
 
-Исходные ограничения: Robinhood Crypto **ЕС**, бюджеты **USD 150 / 1 000 / 5 000**, желаемые входы **USD 10 / 50 / 250**. Публичные адреса кошельков пользователь предоставит позже.
+Исходные ограничения: **Robinhood Chain + Pons (chain ID 4663, gas ETH)**, бюджеты **USD 150 / 1 000 / 5 000**, желаемые входы **USD 10 / 50 / 250**. Публичные адреса кошельков пользователь предоставит позже.
 
-Официальный Robinhood Crypto Trading API заявлен для США. До согласования доступной площадки первый исполняемый продукт ограничивается аналитикой и paper trading.
+Текущий этап — проверка Pons V1/V2, исследование и планирование RESEARCH/PAPER. LIVE включается только после отдельного решения и прохождения gates. Первоначальное предположение о Robinhood Crypto EU заменено уточнением пользователя: Robinhood Chain + Pons.
 
-Документация и project-local skills добавляются в отдельной ветке для ревью. Локальные credentials исключены из Git; приложение не должно читать секреты из браузера или передавать их LLM.
+Материалы: [план](PLAN.md), [разбор ТЗ](docs/research/spec-review.md), [методика проверки edge](docs/research/wallet-edge-validation.md), [skills](docs/skills-inventory.md). Пять project-local skills установлены в `.agents/skills`; их происхождение и хэши фиксирует `skills.lock.json`. Проверка подготовки: `python3 scripts/verify_workspace.py`. Локальные credentials исключены из Git; приложение не должно читать секреты из браузера или передавать их LLM.

@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-Read [PLAN.md](PLAN.md) before substantive changes. The current deliverable is research, skills and a reviewable plan. Do not implement the full bot until the user approves the plan. User has confirmed Robinhood Chain + Pons (chain ID 4663, gas ETH) and USD budgets; source wallet addresses are pending and do not block planning.
+Read [PLAN.md](PLAN.md) before substantive changes. The current deliverable is research, skills and a reviewable plan. Do not implement the full bot until the user approves the plan. User has confirmed Robinhood Chain + Pons (chain ID 4663, gas ETH) and USD budgets. A wallet list has been received and validated locally under ignored `data/wallet-intake/`; do not publish its addresses or labels. Chain activity, Pons participation and profitability remain unverified; source labels are user hypotheses.
 
 The user asked Astra (`gpt-6-astra`) to lead all development and delegate independent work to its subagents. The primary coordinator handles communication and read-only review. Preserve that allocation unless the user changes it. Use small independent tasks; never give two agents ownership of the same file concurrently.
 

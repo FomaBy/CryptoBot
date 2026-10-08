@@ -48,7 +48,7 @@ for name in filter(None, tracked):
         errors.append(f"Forbidden tracked private path: {name}")
 
 # Validate file destinations in authored Markdown, not upstream manuals.
-docs = [ROOT / "README.md", ROOT / "PLAN.md", ROOT / "AGENTS.md"]
+docs = [ROOT / "README.md", ROOT / "PLAN.md", ROOT / "AGENTS.md", ROOT / "REQUIREMENTS.md"]
 docs += list((ROOT / "docs").rglob("*.md"))
 for doc in docs:
     if not doc.is_file():

@@ -5,31 +5,31 @@
     {
       "name": "cryptobot-director",
       "origin": "project-authored",
-      "revision": "1",
+      "revision": "2",
       "upstream_path": null,
       "license": "No separate license grant; project-authored instructions",
       "files": {
-        "SKILL.md": "5d17ceccbd98f6316415bc7a0aa4b287cff15a678fd4ce37eec204525914725e"
+        "SKILL.md": "4826d5973c692308613c5cb5ac5c59dbca90cdb13c412fb9447e9acfc4b23846"
       }
     },
     {
       "name": "cryptobot-execution-safety",
       "origin": "project-authored",
-      "revision": "1",
+      "revision": "2",
       "upstream_path": null,
       "license": "No separate license grant; project-authored instructions",
       "files": {
-        "SKILL.md": "49e7a58ff899c2de0ca7dc233a12064ec9b99335f862aef42b00f9316a1bc8c5"
+        "SKILL.md": "920bcd6204455d23283ff6b8b0bd57356a13b32706682abb2045bd0bf558131a"
       }
     },
     {
       "name": "cryptobot-wallet-research",
       "origin": "project-authored",
-      "revision": "1",
+      "revision": "2",
       "upstream_path": null,
       "license": "No separate license grant; project-authored instructions",
       "files": {
-        "SKILL.md": "4c97a0bd0fbc434100aa40f59a18380d8b7761b2004da46257f15b9d2fbb674d"
+        "SKILL.md": "a2035b7b285d3f2c88a70fb6f023e40b85e655ee5336703c2b92a1c0606fdf3a"
       }
     },
     {

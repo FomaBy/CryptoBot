@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { constantEqual, resolveIdentity } from './auth.js';
 import { addressOf, makeChallenge, signatureMatches, isExternallyOwned } from './wallets.js';
 import { networkStatus } from './network.js';
+import { createAnalysisClient } from './analyses.js';
 
 const WEB = fileURLToPath(new URL('../web/', import.meta.url));
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -28,7 +29,7 @@ async function readBody(req) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw error(400, 'invalid_json', 'Некорректный JSON.'); }
 }
 
-export function createApp({ store, origin = 'https://aistat.app', identity = resolveIdentity, verifyEOA = isExternallyOwned, network = networkStatus(), release = 'development' }) {
+export function createApp({ store, origin = 'https://aistat.app', identity = resolveIdentity, verifyEOA = isExternallyOwned, network = networkStatus(), analyses = createAnalysisClient(), release = 'development' }) {
   const url = new URL(origin);
   if (url.origin !== origin || (url.protocol !== 'https:' && !['127.0.0.1', 'localhost'].includes(url.hostname))) throw new Error('Invalid public origin');
   const server = createServer(async (req, res) => {
@@ -40,7 +41,8 @@ export function createApp({ store, origin = 'https://aistat.app', identity = res
     res.setHeader('cache-control', 'no-store');
     const json = (status, payload) => { res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(payload)); };
     try {
-      const path = new URL(req.url, origin).pathname;
+      const requestUrl = new URL(req.url, origin);
+      const path = requestUrl.pathname;
       if (req.method === 'GET' && path === '/bot') { res.writeHead(308, { location: '/bot/' }); res.end(); return; }
       if (req.method === 'GET' && path === '/bot/api/health') {
         json(200, { status: 'ok', release, liveEnabled: false, paperEnabled: false }); return;
@@ -58,6 +60,11 @@ export function createApp({ store, origin = 'https://aistat.app', identity = res
         throw error(401, 'authentication_required', 'Войдите в аккаунт.');
       }
       const account = store.account(actor.id);
+      if (req.method === 'GET' && path === '/bot/api/analyses') {
+        if ([...requestUrl.searchParams.keys()].some(key => key !== 'snapshot') || requestUrl.searchParams.getAll('snapshot').length > 1) throw error(400, 'invalid_query', 'Неизвестные параметры анализа.');
+        if (!store.allowRate(`analyses:${actor.id}`, 30)) throw error(429, 'rate_limit', 'Слишком много запросов анализа. Повторите через минуту.');
+        json(200, await analyses(requestUrl.searchParams.get('snapshot'))); return;
+      }
       if (req.method === 'GET' && path === '/bot/api/session') {
         json(200, { authenticated: true, user: { id: actor.id, name: actor.name }, csrfToken: actor.csrf,
           capabilities: { walletLinking: true, taskCreation: true, settings: true, liveTrading: false, paperTrading: false, aiWorker: false } }); return;

@@ -6,6 +6,8 @@
 
 ## Подтверждённый выбор
 
+Следующий утверждённый инкремент — общий источник анализов с AI-Crypto-Statistics: `/crypto` сохраняет статистику, `/bot` — кабинет и будущий исполнитель. ACS остаётся единственным производителем существующих оценок; бот получает versioned public projection без private wallet feed и owner cookies. На обеих страницах сопоставимы token/analysis/snapshot IDs, source revision и времена исходных наблюдений. Pons label — только reported scope, registry и sellability остаются непроверенными; оценка ACS не включает live permission. Контракт описан в [общей аналитике](docs/shared-analysis.md).
+
 Пользователь после разбора человеческого ТЗ v1.1 уточнил целевой продукт: **Robinhood Chain + Pons**. Это заменяет первоначальное предположение о Robinhood Crypto EU. Текущий scope — одна сеть, mainnet **chain ID 4663**, gas в **ETH**, только подтверждённые Pons V1/V2; без Solana, Pump и других площадок. Подтверждены бюджеты **USD 150 / 1 000 / 5 000**, входы **USD 10 / 50 / 250**. Список кошельков получен и локально проверен; адреса и labels хранятся только в исключённом из Git `data/wallet-intake/`.
 
 [Официальная документация сети](https://docs.robinhood.com/chain/connecting/) подтверждает chain ID, RPC/WebSocket и необходимость production-провайдера. [Репозиторий Pons](https://github.com/ponsdotdev/pons-labs) описывает V1 и V2. Это подтверждает техническое направление, но ещё не верифицирует deployed bytecode, конкретные адреса, права контрактов, ликвидность или прибыльность стратегии. Первый инженерный gate — versioned registry с проверенным on-chain доказательством для каждого маршрута.
@@ -14,7 +16,7 @@
 
 ## Что уже реализовано и что ещё предстоит
 
-В `server/{auth,store,wallets,app,index}.js` готовы root-session adapter, account-scoped SQLite, EOA ownership challenge/verify/unlink, приватные задачи, USD preset и базовый audit. Защищённые API проверяют сессию, изменяющие запросы — Origin/CSRF; owner/status injection отклоняются. 12 Node-тестов прошли с временными БД и внешними API mocks, включая A/B isolation, подписи/replay/expiry/parallel verify и close/reopen persistence. Статусы R-005/R-006/R-018 остаются PARTIAL до полной приёмки.
+В `server/{auth,store,wallets,app,index}.js` готовы root-session adapter, account-scoped SQLite, EOA ownership challenge/verify/unlink, приватные задачи, USD preset и базовый audit. Защищённые API проверяют сессию, изменяющие запросы — Origin/CSRF; owner/status injection отклоняются. Первый web release опубликован, исходные 16 тестов и UI/public production QA пройдены; текущие проверки расширены для общей аналитики. Статусы R-005/R-006/R-018 остаются PARTIAL до полной приёмки.
 
 Chain research, анализ 214 кандидатов, paper trading, optimiser, development worker и signer отсутствуют. Overview явно возвращает unstarted/not_connected, нулевое число проверенных кошельков, пустые позиции/сделки и неизвестный PnL; UI не должен выдавать это за результаты. Deployment ещё не DONE. Подробности и ограничения — [execution log](docs/execution-log.md).
 
@@ -29,7 +31,7 @@ Chain research, анализ 214 кандидатов, paper trading, optimiser,
 | Этап | Результат | Проверка / условие перехода |
 |---|---|---|
 | 0. Подготовка — выполнена | Исследование, 5 skills, требования и backlog | Пользователь разрешил разработку и deployment; live остаётся отдельным решением |
-| 0a. Multiuser кабинет — в работе | Root login reuse, SQLite account isolation, EOA proof, настройки и приватные задачи | 12 локальных тестов прошли; host inventory выполнена. Deployment IN_PROGRESS, production auth/user-flow checks ещё требуются |
+| 0a. Multiuser кабинет — первый web release опубликован | Root login reuse, SQLite account isolation, EOA proof, настройки и приватные задачи | Локальные auth/UI проверки и public production smoke пройдены; положительный production login/user-flow ещё требует действующей сессии |
 | 1. Feasibility + данные | Реестр Pons V1/V2, ABI/bytecode/routes, production RPC/история, read-only ingestion; публичные кошельки с network ID | Подтверждены registry, токены quote, события и переходы стадий; измерены полнота, задержка, rate limits, права данных и ежемесячная стоимость; неизвестный маршрут — no-go |
 | 2. Исследование edge | Версионированные датасеты, feature pipeline, журнал гипотез, causal replay | Учтены комиссии/спред/ликвидность/FX; воспроизводится выбор кошельков на историческую дату; нет look-ahead |
 | 3. Walk-forward и holdout | Отчёт отдельно для трёх размеров, сравнение с no-trade и простыми baselines | Замороженная стратегия прошла следующие временные окна, final holdout и стресс расходов/задержек; неопределённость и концентрация приемлемы |

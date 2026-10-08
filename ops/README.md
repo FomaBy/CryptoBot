@@ -21,3 +21,9 @@
 ## Возврат маршрута
 
 Авторизованный оператор через тот же runner восстанавливает конкретный сохранённый `root.htaccess`, предварительно проверив, что текущая конфигурация не содержит чужих более поздних изменений. Приложение можно остановить `cloudlinux-selector stop --interpreter=nodejs --app-root=cryptobot/app`. Данные `cryptobot/state` сохраняются; возврат route не требует удаления аккаунтов/кошельков/задач. Перед live-полномочиями потребуется отдельная проверка общей same-origin поверхности root и `/crypto`.
+
+## Интеграционный update двух приложений
+
+`python3 ops/deploy-integration.py --acs-worktree /absolute/path/to/reviewed-worktree` требует чистых, закоммиченных worktrees. Он пакует только явно перечисленные code/UI файлы; исходники приватного ACS находятся лишь в private transport archive, не в public Git. Перед выполнением job сравнивает deployment markers и каждый remote file hash, сохраняя существующие файлы для rollback. При изменении другим процессом операция останавливается до записи.
+
+Update не меняет root rewrite, `.env`, API keys, DB, watchlists, источники или расписания. Перезапуск обоих существующих приложений сохраняет их текущие конфигурации. При неуспешном schema/source/release smoke старые code/UI markers восстанавливаются. Данные не откатываются, поскольку schema migrations в этом update отсутствуют. После rc=0 отдельно проверяются producer/consumer, точные snapshot links, privacy и UI. Private backups и smoke responses не публикуются.

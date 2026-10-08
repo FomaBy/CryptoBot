@@ -5,7 +5,7 @@
   const CHAIN_ID = 4663;
   const CHAIN_HEX = "0x1237";
   const TABS = { overview: "Обзор", wallets: "Кошельки", backlog: "Задачи", research: "Исследование" };
-  const state = { session: null, overview: null, wallets: null, tasks: null, preset: null, selectedPreset: null, loading: false, providers: [], walletAttempt: 0, proof: null, providerListeners: null, walletBusy: false, taskBusy: false, unlinkId: null };
+  const state = { session: null, overview: null, wallets: null, tasks: null, preset: null, selectedPreset: null, loading: false, providers: [], walletAttempt: 0, proof: null, providerListeners: null, walletBusy: false, taskBusy: false, unlinkId: null, analysis: null, analysisStarted: false, analysisLoading: false, analysisRequest: 0 };
   const $ = (id) => document.getElementById(id);
   const text = (value, fallback = "") => typeof value === "string" ? value : fallback;
   const can = (key) => state.session?.authenticated === true && !!state.session.csrfToken && state.session.capabilities?.[key] === true;
@@ -70,7 +70,11 @@
       showLoggedOut();
       throw new Error("Сессия завершилась. Войдите в Aistat заново.");
     }
-    if (!response.ok) throw new Error(text(body?.message, text(body?.error, `Запрос не выполнен (HTTP ${response.status}).`)));
+    if (!response.ok) {
+      const error = new Error(text(body?.message, text(body?.error, `Запрос не выполнен (HTTP ${response.status}).`)));
+      error.status = response.status;
+      throw error;
+    }
     if (body === undefined && response.status !== 204) throw new Error("Сервер вернул неподдерживаемый ответ. Обновите страницу позже.");
     return body || {};
   }
@@ -80,6 +84,12 @@
     state.wallets = null;
     state.tasks = null;
     state.overview = null;
+    state.analysis = null;
+    state.analysisStarted = false;
+    state.analysisRequest += 1;
+    state.analysisLoading = false;
+    $("analysis-list").replaceChildren();
+    $("analysis-provenance").replaceChildren();
     cancelProof();
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
     $("dashboard").hidden = true;
@@ -87,6 +97,8 @@
     $("gate-title").textContent = "Ваше рабочее пространство";
     $("gate-copy").textContent = "Войдите через Aistat, чтобы связать кошелёк с аккаунтом и управлять личными задачами.";
     $("login-link").hidden = false;
+    const returnPath = `/bot/${location.search}${location.hash}`;
+    $("login-link").href = `/login?next=${encodeURIComponent(returnPath)}`;
     $("retry-session").hidden = true;
     $("account-name").textContent = "Вы не вошли";
     $("account-description").textContent = "Вход через Aistat";
@@ -112,6 +124,7 @@
       $("dashboard").hidden = false;
       syncControls();
       await refresh();
+      if (location.hash === "#research") loadAnalyses();
     } catch (error) {
       if (!$("login-link").hidden) return;
       $("gate-title").textContent = "Кабинет пока недоступен";
@@ -492,12 +505,165 @@
     Object.keys(TABS).forEach((key) => { $(`panel-${key}`).hidden = key !== tab; });
     $("breadcrumb-title").textContent = TABS[tab];
     document.title = `${TABS[tab]} · CryptoBot`;
+    if (tab === "research" && state.session?.authenticated && !state.analysisStarted) loadAnalyses();
+  }
+
+  const HASH_RE = /^[a-f0-9]{64}$/;
+  const ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
+
+  function analysisQuery() {
+    const params = new URLSearchParams(location.search);
+    return { snapshot: params.get("analysis"), token: params.get("token") };
+  }
+
+  function analysisLink(snapshot, address) {
+    const url = new URL("/crypto/analysis.html", location.origin);
+    url.searchParams.set("snapshot", snapshot);
+    if (address) url.searchParams.set("token", address);
+    return url.pathname + url.search;
+  }
+
+  function sourceFact(list, label, value) {
+    list.append(node("dt", "", label), node("dd", "", value === null || value === undefined || value === "" ? "Не указано" : String(value)));
+  }
+
+  function analysisNumber(value) {
+    return typeof value === "number" && Number.isFinite(value) ? String(value) : "Не указан";
+  }
+
+  function analysisUsd(value) {
+    if (typeof value !== "string" || !/^-?\d+(?:\.\d+)?$/.test(value)) return "Неизвестно";
+    return `$${value}`;
+  }
+
+  function renderAnalyses() {
+    const data = state.analysis;
+    const query = analysisQuery();
+    const provenance = $("analysis-provenance");
+    const list = $("analysis-list");
+    list.replaceChildren();
+    provenance.replaceChildren();
+    const details = node("details", "analysis-details");
+    details.append(node("summary", "", `Снимок ${data.snapshotId.slice(0, 12)}… · ${data.asOf ? date(data.asOf, true) : "Время данных неизвестно"}`));
+    const facts = node("dl", "analysis-facts");
+    sourceFact(facts, "Snapshot ID", data.snapshotId);
+    sourceFact(facts, "Данные на (asOf)", data.asOf);
+    sourceFact(facts, "Ответ источника (servedAt)", data.servedAt);
+    sourceFact(facts, "Источник", data.source?.id);
+    sourceFact(facts, "Ревизия источника", data.source?.revision);
+    sourceFact(facts, "Схема", data.schemaVersion);
+    details.append(facts);
+    provenance.append(details);
+    $("analysis-common-link").href = analysisLink(data.snapshotId, query.token && ADDRESS_RE.test(query.token) ? query.token.toLowerCase() : null);
+    const included = data.items.filter((item) => item.botScope === "pons_reported");
+    const excluded = data.items.length - included.length;
+    const coverage = data.coverage || {};
+    $("analysis-coverage").textContent = `Pons по данным ACS: ${included.length}. Исключено из кабинета: ${excluded} с неподтверждённым происхождением. В снимке ${data.items.length}; опубликовано источником ${Number.isInteger(coverage.published) ? coverage.published : "неизвестно"}, лимит ${Number.isInteger(coverage.limit) ? coverage.limit : "не указан"}. Проверка реестра и доступности продажи отдельно не выполнена.`;
+    const selected = query.token?.toLowerCase();
+    if (selected && !included.some((item) => item.address === selected)) {
+      const exists = data.items.some((item) => item.address === selected);
+      notice("analysis-message", exists ? "Выбранный токен присутствует в снимке, но его происхождение не подтверждено как Pons. Он исключён из текущей области CryptoBot." : "Выбранного токена нет в этом снимке. Снимок не заменён свежим автоматически.");
+    }
+    if (!included.length) {
+      emptyState(list, "В снимке нет токенов Pons", "Другие происхождения не входят в текущую область CryptoBot. Это не результат проверки безопасности или отсутствия рисков.", "—");
+      return;
+    }
+    for (const item of included) {
+      const card = node("article", "analysis-token");
+      card.id = `analysis-token-${item.address}`;
+      card.tabIndex = -1;
+      if (item.address === selected) card.classList.add("analysis-selected");
+      const head = node("div", "analysis-token-heading");
+      const title = node("div", "");
+      title.append(node("h3", "", item.symbol || item.name || "Токен без имени"), node("p", "analysis-token-name", item.name || "Название не указано"));
+      head.append(title, node("span", "pill neutral", "Pons · источник ACS"));
+      const contract = node("p", "analysis-contract", item.address);
+      const metrics = node("dl", "analysis-metrics");
+      sourceFact(metrics, "Оценка ACS", analysisNumber(item.assessment?.score));
+      sourceFact(metrics, "Уровень ACS", item.assessment?.tier);
+      sourceFact(metrics, "Оценка входа ACS", analysisNumber(item.assessment?.entryScore));
+      sourceFact(metrics, "Вердикт входа ACS", item.assessment?.entryVerdict);
+      sourceFact(metrics, "Цена USD", analysisUsd(item.market?.priceUsd));
+      sourceFact(metrics, "Quote liquidity USD", analysisUsd(item.market?.quoteLiquidityUsd));
+      const gate = node("p", "analysis-gate", "Допуск CryptoBot: не проверен. Registry и исполнимая продажа неизвестны. Торговля не разрешена этим анализом.");
+      const evidence = node("details", "analysis-details");
+      evidence.append(node("summary", "", "Идентификаторы, источник и неизвестные данные"));
+      const meta = node("dl", "analysis-facts");
+      sourceFact(meta, "Analysis ID", item.analysisId);
+      sourceFact(meta, "Версия анализа", item.version);
+      sourceFact(meta, "Token ID", item.tokenId);
+      sourceFact(meta, "Chain ID", item.chainId);
+      sourceFact(meta, "Происхождение ACS", item.launchpad);
+      sourceFact(meta, "Стадия ACS", item.stage);
+      sourceFact(meta, "Данные токена на", item.asOf);
+      sourceFact(meta, "Market timestamp", item.timestamps?.market);
+      sourceFact(meta, "Score timestamp", item.timestamps?.score);
+      sourceFact(meta, "Entry timestamp", item.timestamps?.entry);
+      sourceFact(meta, "Версия модели входа ACS", item.assessment?.entryVersion);
+      sourceFact(meta, "Вердикт решения ACS", item.assessment?.decisionVerdict);
+      sourceFact(meta, "Коды оснований ACS", item.assessment?.reasonCodes?.join(", ") || "Не указаны");
+      sourceFact(meta, "Коды рисков ACS", item.assessment?.riskCodes?.join(", ") || "Не указаны — это не отсутствие риска");
+      sourceFact(meta, "Неизвестные поля ACS", item.unknowns?.join(", ") || "Источник не перечислил; безопасность не доказана");
+      evidence.append(meta);
+      const link = node("a", "text-button", "Открыть этот снимок в /crypto ↗");
+      link.href = analysisLink(data.snapshotId, item.address);
+      card.append(head, contract, metrics, gate, evidence, link);
+      list.append(card);
+    }
+    if (selected) document.getElementById(`analysis-token-${selected}`)?.scrollIntoView({ block: "start", behavior: "instant" });
+  }
+
+  async function loadAnalyses(latest = false) {
+    if (!state.session?.authenticated || state.analysisLoading) return;
+    state.analysisStarted = true;
+    state.analysisLoading = true;
+    const request = ++state.analysisRequest;
+    const query = analysisQuery();
+    const requested = latest ? null : query.snapshot;
+    $("analysis-latest").disabled = true;
+    $("analysis-retry").disabled = true;
+    $("analysis-retry").hidden = true;
+    notice("analysis-message", requested ? "Загружаем указанный снимок ACS…" : "Загружаем опубликованный снимок ACS…");
+    state.analysis = null;
+    $("analysis-list").replaceChildren();
+    $("analysis-provenance").replaceChildren();
+    $("analysis-coverage").textContent = "Ответ источника ещё не получен.";
+    $("analysis-common-link").href = "/crypto/analysis.html";
+    try {
+      if ((requested && !HASH_RE.test(requested)) || (query.token && !ADDRESS_RE.test(query.token))) throw new Error("Некорректный идентификатор снимка или адрес токена в ссылке.");
+      const data = await api(`/analyses${requested ? `?snapshot=${encodeURIComponent(requested)}` : ""}`);
+      if (request !== state.analysisRequest) return;
+      if (data.schemaVersion !== "acs.analysis.v1" || data.chainId !== CHAIN_ID || !HASH_RE.test(data.snapshotId || "") || !Array.isArray(data.items) || data.executionAuthorized !== false || (requested && data.snapshotId !== requested)) throw new Error("Схема, сеть или снимок источника не совпадают с запросом. Данные не показаны.");
+      for (const item of data.items) {
+        if (item.chainId !== CHAIN_ID || !ADDRESS_RE.test(item.address || "") || !HASH_RE.test(item.analysisId || "") || !HASH_RE.test(item.version || "") || item.executionAuthorized !== false) throw new Error("Источник вернул неподдерживаемый анализ токена.");
+      }
+      state.analysis = data;
+      const url = new URL(location.href);
+      url.searchParams.set("analysis", data.snapshotId);
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+      notice("analysis-message", "");
+      renderAnalyses();
+    } catch (error) {
+      if (request !== state.analysisRequest) return;
+      const message = error.status === 410 ? `Снимок ${requested || "из ссылки"} больше не доступен. Новый анализ не подставлен вместо него. Чтобы перейти к другим данным, нажмите «Загрузить свежий снимок».` : errorMessage(error);
+      notice("analysis-message", message, true);
+      $("analysis-coverage").textContent = "Общий анализ не загружен. Оценки и результаты не подменяются демонстрационными.";
+      $("analysis-retry").hidden = false;
+    } finally {
+      if (request === state.analysisRequest) {
+        state.analysisLoading = false;
+        $("analysis-latest").disabled = false;
+        $("analysis-retry").disabled = false;
+      }
+    }
   }
 
   window.addEventListener("hashchange", selectTab);
   selectTab();
   $("refresh-button").addEventListener("click", refresh);
   $("retry-session").addEventListener("click", loadSession);
+  $("analysis-latest").addEventListener("click", () => loadAnalyses(true));
+  $("analysis-retry").addEventListener("click", () => loadAnalyses(false));
   document.querySelectorAll("[data-connect]").forEach((button) => button.addEventListener("click", openWalletDialog));
   document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", () => $(button.dataset.close).close()));
   $("wallet-dialog").addEventListener("close", cancelProof);

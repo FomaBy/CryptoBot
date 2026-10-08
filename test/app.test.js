@@ -19,7 +19,7 @@ const task = { title: 'Private A task', description: 'Only A sees this', accepta
 async function fixture(t, options = {}) {
   const store = createStore(options.filename ?? ':memory:');
   const server = createApp({ store, origin, identity: async req => actors[req.headers['x-test-actor']] ?? null,
-    verifyEOA: options.verifyEOA ?? (async () => true), network: async () => ({ status: 'unavailable', chainId: 4663 }) });
+    verifyEOA: options.verifyEOA ?? (async () => true), network: async () => ({ status: 'unavailable', chainId: 4663 }), analyses: options.analyses ?? (async () => ({ test: true })) });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   let closed = false;
@@ -50,7 +50,7 @@ const verify = (call, proof, actor = 'a') => call('wallets/verify', { actor, met
 
 test('protected data requires login; public session and health reveal no account data', async t => {
   const { call } = await fixture(t);
-  for (const path of ['overview', 'tasks', 'wallets', 'audit']) {
+  for (const path of ['overview', 'tasks', 'wallets', 'audit', 'analyses']) {
     const response = await call(path, { actor: 'none' });
     assert.equal(response.status, 401);
     assert.equal(response.body.error, 'authentication_required');
@@ -66,6 +66,18 @@ test('protected data requires login; public session and health reveal no account
   assert.equal(overview.body.validatedWallets, 0);
   assert.equal(overview.body.pnl, null);
   assert.deepEqual((await call('wallets')).body.wallets, []);
+});
+
+test('analysis proxy requires a session and accepts only an exact snapshot selector', async t => {
+  let calls = 0; let selected;
+  const { call } = await fixture(t, { analyses: async id => { calls++; selected = id; return { snapshotId: id }; } });
+  assert.equal((await call('analyses', { actor: 'none' })).status, 401);
+  assert.equal(calls, 0);
+  const id = 'a'.repeat(64);
+  const result = await call('analyses?snapshot=' + id);
+  assert.equal(result.status, 200); assert.equal(selected, id);
+  assert.equal((await call('analyses?url=https://evil.example')).status, 400);
+  assert.equal((await call('analyses?snapshot=' + id + '&snapshot=' + id)).status, 400);
 });
 
 test('tenant isolation covers tasks, settings, wallets and audit; unknown owner/status fields cannot grant authority', async t => {

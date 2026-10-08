@@ -1,13 +1,13 @@
 # Backlog CryptoBot
 
-Обновлено 8 октября 2026. Первый multiuser web-инкремент опубликован: приватные задачи/настройки/EOA proof. Следующий инкремент связывает `/crypto` и `/bot` общим анализом. **Runtime worker ещё не создан и не забирает задачи.** PARTIAL означает выполненную часть задачи с явным оставшимся acceptance.
+Обновлено 8 октября 2026. Первый multiuser web-инкремент опубликован: приватные задачи/настройки/EOA proof. Интеграция `/crypto` и `/bot` с общими анализами опубликована и проверена. **Runtime worker ещё не создан и не забирает задачи.** PARTIAL означает выполненную часть задачи с явным оставшимся acceptance.
 
 Статусы: `PLANNED`, `READY`, `IN_PROGRESS`, `EVIDENCE_REVIEW`, `STAGING`, `PARTIAL`, `DONE`, `BLOCKED`, `QUARANTINED`. `READY` требует выполненных dependencies и явной применимой scope-policy. Priority P0 — прежде зависимых работ, P1 — следующее, P2 — после базового доказательства. Даты и сроки появятся после ревью плана.
 
 | ID / приоритет | Задача и R-ID | Статус / зависимости | Выходное доказательство |
 |---|---|---|---|
-| B-021 / P1 | Единый canonical analysis API ACS и bot adapter. R-023,024 | IN_PROGRESS / B-010,013 | Published views без повторных оценок; strict public schema; stable content IDs, bounded snapshots/410, timestamps unknown честно; producer/consumer, privacy и session tests. Private ACS source не копируется в public CryptoBot. |
-| B-022 / P1 | Общие анализы и переходы `/crypto` ↔ `/bot`. R-023,024 | IN_PROGRESS / B-021 | Radar drawer и bot research показывают сопоставимые IDs/значения и exact snapshot links. Pons-only bot view, явные пустые/expired/unavailable состояния, desktop/mobile QA. Точечный dual-app deploy с hash preconditions/backup/rollback и production smoke. |
+| B-021 / P1 | Единый canonical analysis API ACS и bot adapter. R-023,024 | DONE — E-015/017 / реализованная часть B-010,013 | Published views без повторных оценок; strict public schema; stable content IDs, bounded snapshots/410, timestamps unknown честно; producer/consumer, privacy и session tests. Private ACS source не копируется в public CryptoBot. |
+| B-022 / P1 | Общие анализы и переходы `/crypto` ↔ `/bot`. R-023,024 | DONE — E-015/017 / B-021 | Radar drawer и bot research показывают сопоставимые IDs/значения и exact snapshot links. Pons-only bot view, явные пустые/expired/unavailable состояния, desktop/mobile QA. Точечный dual-app deploy с hash preconditions/backup/rollback и production smoke; positive production login остаётся ограничением R-005. |
 | B-001 / P0 | Подготовить исследование, skills, план и repo. R-001–003 | DONE / — | PR #1, commits `c1751c6`, `72c129e`; skill provenance/lock и успешный preparation CI. DONE относится к подготовке, не R-001 runtime. |
 | B-002 / P0 | Принять приватный wallet cohort. R-004 | DONE / B-001 | Локально 214 valid unique, 0 invalid/duplicate addresses; source hash/manifest/report, ignore и permissions проверены; публично только статус в `a16e057`. |
 | B-003 / P0 | Зафиксировать новые требования и политику AI-автономии. R-003,005–022 | DONE / B-001 | REQUIREMENTS.md, backlog, execution log, skills/PLAN; независимый design review и preparation checks. Позднее пользователь разрешил разработку/deployment и multiuser (E-006); это не live mandate. |

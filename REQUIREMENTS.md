@@ -69,14 +69,16 @@ Search envelope фиксирует разрешённые признаки/оп�
 
 В `test/*.test.js` прошли 12 тестов, включая A/B isolation, CSRF/origin, подмену полей, EOA wrong-signature/account/session, expiry/replay, два параллельных verify, отказ для contract wallet, отзыв root-сессии и SQLite close/reopen. Внешние сервисы замокированы. Это не production E2E и не доказательство торговой безопасности. В ответах API paper/live отключены; research/analysis не начаты, AI worker не подключён, прибыль не выдумывается. Связь с событиями E-006–E-008: [журнал](docs/execution-log.md).
 
-## Открытые решения
+## Общая аналитика
 
 Дополнение U7: пользователь подтвердил связь с AI-Crypto-Statistics: статистика остаётся `/crypto`, бот `/bot`, обе страницы используют один анализ токенов.
 
 | ID | Требование, источник, статус | Критерий приёмки |
 |---|---|---|
-| R-023 | Единый источник анализа ACS для двух страниц. U7. IN_PROGRESS | Анализ строится только существующим ACS engine; общий API проецирует опубликованные значения, не вызывает LLM/providers/watch и не пересчитывает score. Обе страницы показывают одинаковые snapshot ID, token identity, analysis ID/version, source revision и observation timestamps. Ссылка на точный сохранённый снимок возвращает его либо явный 410; не подменяется latest. |
-| R-024 | Разделить общий анализ и приватные полномочия. U7, R-005,021. IN_PROGRESS | Canonical endpoint всегда использует фиксированный публичный allowlist, независимо от ACS owner cookie/loopback/настройки private names. Wallet identities/feed, account tasks, secrets и private source отсутствуют. Bot proxy проверяет root session, не пересылает cookies и отклоняет неизвестные поля/цепочки/формат. В интерфейсе бота только reported Pons на 4663; label не доказывает registry/sellability. Аналитика не разрешает торговлю. |
+| R-023 | Единый источник анализа ACS для двух страниц. U7. DONE — текущая published projection, E-017 | Анализ строится только существующим ACS engine; общий API проецирует опубликованные значения, не вызывает LLM/providers/watch и не пересчитывает score. Обе страницы показывают одинаковые snapshot ID, token identity, analysis ID/version, source revision и observation timestamps. Ссылка на точный сохранённый снимок возвращает его либо явный 410; не подменяется latest. |
+| R-024 | Разделить общий анализ и приватные полномочия. U7, R-005,021. DONE — integration boundary, E-017; R-005 остаётся PARTIAL | Canonical endpoint всегда использует фиксированный публичный allowlist, независимо от ACS owner cookie/loopback/настройки private names. Wallet identities/feed, account tasks, secrets и private source отсутствуют. Bot proxy проверяет root session, не пересылает cookies и отклоняет неизвестные поля/цепочки/формат. В интерфейсе бота только reported Pons на 4663; label не доказывает registry/sellability. Аналитика не разрешает торговлю. |
+
+## Открытые решения
 
 1. Месячный операционный бюджет AI/данных/RPC ещё не утверждён; создание сайта не разрешает неограниченные платные workers. Multiuser уже выбран и больше не является открытым решением.
 2. Способ автономной подписи: проверенные delegated/session permissions или отдельный ограниченно финансируемый кошелёк бота; конкретный custody/ключевой lifecycle утверждается после проверки поддержки. Одного Connect Wallet недостаточно.

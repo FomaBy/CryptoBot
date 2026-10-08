@@ -6,7 +6,7 @@
 
 ## Подтверждённый выбор
 
-Следующий утверждённый инкремент — общий источник анализов с AI-Crypto-Statistics: `/crypto` сохраняет статистику, `/bot` — кабинет и будущий исполнитель. ACS остаётся единственным производителем существующих оценок; бот получает versioned public projection без private wallet feed и owner cookies. На обеих страницах сопоставимы token/analysis/snapshot IDs, source revision и времена исходных наблюдений. Pons label — только reported scope, registry и sellability остаются непроверенными; оценка ACS не включает live permission. Контракт описан в [общей аналитике](docs/shared-analysis.md).
+Опубликован общий источник анализов с AI-Crypto-Statistics: `/crypto` сохраняет статистику, `/bot` — кабинет и будущий исполнитель. ACS остаётся единственным производителем существующих оценок; бот получает versioned public projection без private wallet feed и owner cookies. На обеих страницах сопоставимы token/analysis/snapshot IDs, source revision и времена исходных наблюдений. Pons label — только reported scope, registry и sellability остаются непроверенными; оценка ACS не включает live permission. Контракт описан в [общей аналитике](docs/shared-analysis.md).
 
 Пользователь после разбора человеческого ТЗ v1.1 уточнил целевой продукт: **Robinhood Chain + Pons**. Это заменяет первоначальное предположение о Robinhood Crypto EU. Текущий scope — одна сеть, mainnet **chain ID 4663**, gas в **ETH**, только подтверждённые Pons V1/V2; без Solana, Pump и других площадок. Подтверждены бюджеты **USD 150 / 1 000 / 5 000**, входы **USD 10 / 50 / 250**. Список кошельков получен и локально проверен; адреса и labels хранятся только в исключённом из Git `data/wallet-intake/`.
 
@@ -140,7 +140,7 @@ AI не повышает hard caps и не переписывает собств
 
 Выполнена [read-only host/auth инвентаризация](docs/host-inventory.md): root — Python CGI, `/crypto` — отдельное Node 24 приложение, текущий root catch-all поглощает `/bot`. `aistat_session` — непрозрачный токен с серверной записью; `/api/session` без cookie возвращает 401 JSON/no-store. Локальный backend CryptoBot проверяет этот фиксированный endpoint и изолирует SQLite по авторитетному `user_id`; secret root login ему не нужен. Локальная root-копия отличается от remote, поэтому интеграция опирается на проверенный remote contract.
 
-Deployment на `aistat.app/bot` уже разрешён и IN_PROGRESS: отдельный app root, точный prefix route до catch-all, сохранение root и `/crypto`, reversible release и post-deploy checks. Успех не объявляем до наблюдаемых HTTP/auth/user-flow результатов и идентификации релиза. DNS/OAuth не меняем без соответствующей необходимости и авторизации; live/signing не включаем. Совместный origin требует учитывать XSS/service-worker scope, а условия shared hosting — отдельно проверять для будущих непрерывных workers.
+Deployment кабинета и общей аналитики на `aistat.app/bot` выполнен; автоматический delivery worker остаётся в плане: отдельный app root, точный prefix route до catch-all, сохранение root и `/crypto`, reversible release и post-deploy checks. HTTP/assets/release и отказ неавторизованным запросам проверены; положительный production user-flow требует действующей пользовательской сессии. DNS/OAuth не меняем без соответствующей необходимости и авторизации; live/signing не включаем. Совместный origin требует учитывать XSS/service-worker scope, а условия shared hosting — отдельно проверять для будущих непрерывных workers.
 
 ## Текущий порядок работы
 

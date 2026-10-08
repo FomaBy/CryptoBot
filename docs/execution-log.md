@@ -62,3 +62,31 @@ R-005/R-006/R-018 отмечены PARTIAL, B-010/B-016 — PARTIAL. Это ко
 AGENTS/PLAN/REQUIREMENTS/README/backlog и три custom skills приведены к U6: разработка/deployment разрешены, multiuser выбран, live mandate и месячный AI/data budget остаются отдельными. Custom skills подняты до revision 3 с SHA-256 фактических файлов; два upstream пакета не менялись. Полнота roadmap сохранена, частично выполненные acceptance не заменены на DONE.
 
 Evidence: `python3 scripts/verify_workspace.py` прошёл для 5 skills, 21 хэша и 11 документов; `quick_validate.py` прошёл для всех трёх изменённых skills. Проверены уникальность 22 R-ID и 20 B-ID, явные ссылки backlog и `git diff --check` по изменённым файлам. Это проверка документации/происхождения, не deployment. Связь: R-003,022; B-003,004,010,016,018.
+
+## E-010 — 8 октября 2026 — browser QA и расширенные проверки
+
+16/16 native Node tests прошли: к E-008 добавлены атомарный wallet cap при заранее созданных challenges, RPC chain/block evidence и coalescing, отказ по неправильной сети и streaming size cap. JSON null сервиса авторизации возвращает typed 503. CI устанавливает pinned lock без lifecycle scripts; credentials ему не выдаются.
+
+Независимый координатор проверил local fixture в браузере: private task create/reload/cancel/filter/restore, буквальный вывод HTML без исполнения, сохранение USD preset 1000, no-extension UX. Исправлена мобильная навигация 390×844; повторная проверка показала видимые работающие ссылки. Дочерний агент в отдельном in-memory окружении проверил EIP-6963 → SIWE preview → локальную test EOA подпись → verify → unlink, anonymous gate и отсутствие JS ошибок. Это тестовый provider, не подтверждение совместимости всех брендов кошельков. Связь: R-005,006,018,022; B-010,013,016.
+
+## E-011 — 8 октября 2026 — первая публикация web-инкремента
+
+В 10:20:13 UTC опубликован release `web-02214c9a0634c4a1` в отдельном Node 24.21 приложении `/bot`. Health вернул HTTP 200 с точным release, `liveEnabled=false`, `paperEnabled=false`; cron deployment job завершился rc=0. Web source/lock соответствует commit `71c935d`; bundle SHA-256 `07ad39719b0df36d45e4aaded0b3445b2318758b5f23b0daa35f8072dfc7a841`. [GitHub CI для этого commit](https://github.com/FomaBy/CryptoBot/actions/runs/37762737086) завершился success, включая 16 тестов.
+
+Первый smoke в 10:15 UTC получил 404: cPanel создал public mount directory с mode 0700 из private umask. Автоматический rollback восстановил исходный root routing; `/bot` снова возвращал прежний root login redirect. Доступ public mount исправлен на 0755/0644, private state сохранён 0700/0600. Следующий smoke прошёл. Bootstrap script исправлен; исходная root-конфигурация сохранена вне public directory. Root auth/source, `/crypto`, DNS и OAuth не менялись. В пакете только явные web/runtime/dependency пути; private watchlist/credentials/preview исключены.
+
+Независимый координатор и разработчик подтвердили production: `/bot/` и JS/CSS 200, health с точным release, session без cookie `authenticated=false`, protected API 401, root `/login` 200 и `/api/session` 401, `/crypto/` 200, `/botany` остаётся root route. Browser production показал login gate и корректную ссылку на существующий login/Google.
+
+Координатор отдельно отправил синтаксически валидную случайную несуществующую session cookie: `/bot/api/session` вернул `authenticated=false`, не 503. Это подтверждает production server-to-server доступ к root auth и отказ неизвестной сессии; положительную пользовательскую сессию не заменяет. Cookie не выводился.
+
+Одна попытка root login с ранее предоставленным password-файлом вернула 401; password/username/cookie не выводились, повторных попыток и password reset не было. Поэтому успешная **авторизованная production** сессия ещё не подтверждена; требуется вход пользователя действующим способом. Изоляция двух synthetic accounts и подписи проверены локально, не выдаются за два реальных Google-аккаунта. Реальные кошельки, средства, trade signing, paper, optimizer и AI worker не включались. Связь: R-005,020,021,022; B-004,010,013,018 — частичная поставка, полный roadmap сохранён.
+
+## E-012 — 8 октября 2026 — pinned chain snapshot
+
+Read-only RPC подтвердил chain 4663, numbered block 83237066 и одинаковый hash при повторном запросе. Runtime code двух фабрик прочитан на этом номере; SHA-256/Keccak и source commit зафиксированы в [chain snapshot](research/chain-snapshot.md). Это partial B-005/R-009 и начальный evidence для B-006/R-010: source-bytecode equivalence, finality, event ingestion и анализ кошельков не выполнены. 214 private watchlist адресов не запрашивались и не публиковались.
+
+## E-013 — 8 октября 2026 — исправление tablet-layout и текущий release
+
+Production QA обнаружил подпись бренда, выступающую за компактную sidebar на ширине около 700px. CSS исправлен; browser проверки 700×900, 390×844 и 1440×1050 подтвердили доступную навигацию, отсутствие горизонтального переполнения и JS ошибок. Изменён только layout CSS.
+
+В 10:25:35 UTC точечный update завершился rc=0. Текущий release **`web-4fbf9a6f4761cd91`**, health HTTP 200/live=false; SHA-256 реально отданного CSS совпал с локальным `da01afcd76097da37c240f2e084f8d8d81233e430e26ca657fb8337caf5aa223`. Перед обновлением проверены предыдущая версия и hash CSS, сохранены CSS/RELEASE; на ошибке предусмотрено их восстановление и restart. Root route/auth и DB не менялись. Связь: R-020,022; B-013,018. Full authenticated production acceptance и runtime worker остаются незавершёнными.

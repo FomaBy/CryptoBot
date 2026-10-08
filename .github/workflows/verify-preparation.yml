@@ -1,4 +1,4 @@
-name: Verify preparation
+name: Verify CryptoBot
 on:
   pull_request:
   push:
@@ -16,5 +16,12 @@ jobs:
           fetch-depth: 2
       - name: Verify skills, documentation and tracked paths
         run: python3 scripts/verify_workspace.py
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Install locked dependencies without lifecycle scripts
+        run: npx --yes pnpm@10.17.1 install --frozen-lockfile --ignore-scripts
+      - name: Verify account isolation and wallet proof
+        run: node --test test/*.test.js
       - name: Check whitespace
         run: git diff --check HEAD^ HEAD

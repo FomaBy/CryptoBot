@@ -1,0 +1,24 @@
+# Local credentials supplied outside version control
+/aistat-login.txt
+/aistat-oauth-setup.txt
+/auth.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Private datasets and generated artifacts
+data/
+artifacts/
+logs/
+*.log
+.DS_Store
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+dist/
+.next/

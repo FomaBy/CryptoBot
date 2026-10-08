@@ -32,7 +32,12 @@ def _request(path, data=None, content_type=None):
     return result.get('data')
 
 def read_file(directory, filename):
-    return _request('/execute/Fileman/get_file_content?' + urllib.parse.urlencode({'dir': directory, 'file': filename}))['content']
+    # cPanel otherwise rewrites HTML charset markup in the returned representation.
+    # Hash guards require the original UTF-8 text, not the editor-normalized variant.
+    return _request('/execute/Fileman/get_file_content?' + urllib.parse.urlencode({
+        'dir': directory, 'file': filename, 'from_charset': 'UTF-8', 'to_charset': 'UTF-8',
+        'update_html_document_encoding': '0'
+    }))['content']
 
 def upload(directory, filename, content):
     boundary = 'CryptoBot' + uuid.uuid4().hex

@@ -21,9 +21,16 @@ ROOTS = {'bot': 'cryptobot/app', 'acs': 'acs/app'}
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--acs-worktree', required=True)
+    parser.add_argument('--acs-base', required=True, help='Reviewed commit matching the previous ACS code')
+    parser.add_argument('--bot-base', required=True, help='Reviewed commit matching the previous bot code')
+    parser.add_argument('--reviewed-remote-hashes', help='Private JSON of individually reviewed base exceptions')
     args = parser.parse_args()
     if not CPANEL_USER or not CPANEL_USER.isalnum(): raise SystemExit('Set CRYPTOBOT_CPANEL_USER locally')
     roots = {'bot': BOT, 'acs': Path(args.acs_worktree).resolve()}
+    bases = {'bot': args.bot_base, 'acs': args.acs_base}
+    exceptions = json.loads(Path(args.reviewed_remote_hashes).read_text()) if args.reviewed_remote_hashes else {}
+    for app, base in bases.items():
+        subprocess.check_call(['git', 'rev-parse', '--verify', base + '^{commit}'], cwd=roots[app], stdout=subprocess.DEVNULL)
     for root in roots.values():
         if subprocess.check_output(['git', 'status', '--porcelain'], cwd=root).strip():
             raise SystemExit('Commit and review both worktrees before packaging')
@@ -49,6 +56,13 @@ def main():
             except RuntimeError:
                 # The job independently verifies absence; an unexpected existing file aborts.
                 before = None
+            if relative != marker:
+                previous = subprocess.run(['git', 'show', bases[app] + ':' + relative], cwd=roots[app], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                expected = hashlib.sha256(previous.stdout).hexdigest() if previous.returncode == 0 else None
+                expected = exceptions.get(app + '/' + relative, expected)
+                actual = hashlib.sha256(before).hexdigest() if before is not None else None
+                if actual != expected:
+                    raise SystemExit('Remote differs from reviewed base: ' + app + '/' + relative + '; inspect before retry')
             manifest['files'].append({'app': app, 'path': relative, 'before': hashlib.sha256(before).hexdigest() if before is not None else None,
                                       'after': hashlib.sha256(data).hexdigest()})
             payloads[app + '/' + relative] = data

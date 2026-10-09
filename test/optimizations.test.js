@@ -21,10 +21,16 @@ test('finite study consumer preserves all 48 trials and rejects changed evidence
   assert.throws(()=>optimizationParams({studyId:'best-winner'}),{status:400});
 });
 
+test('source drift with freshly recomputed content hash still cannot change the reviewed evaluator exits or selection',()=>{
+  for(const mutate of [d=>d.evaluatorHash='0'.repeat(64),d=>d.assumptions.exits.C.stopPct=0,d=>d.selection.rankedCandidateIds=[]]){
+    const d=fixture();mutate(d);const{reportId,generatedAt,...frozen}=d;d.reportId=createHash('sha256').update(JSON.stringify(frozen)).digest('hex');assert.throws(()=>validateOptimization(d));
+  }
+});
+
 test('failed trials remain in the fixed grid and cannot become successful candidates',()=>{
   const d=fixture(), t=d.trials[0];t.computationStatus='failed';t.error='evaluation_failed';t.metrics=null;
   t.diagnostics={skipped:{},baselineDeltaUsd:null,accountingBridge:'net_plus_modeled_costs_not_costfree_rerun',behaviorHash:null,entryDelaySec:null,finalExitDelaySec:null,holdingSecs:null};
-  d.computationStatus='failed';d.selection.selectedCandidateId=null;d.selection.rankedCandidateIds=d.selection.rankedCandidateIds.filter(id=>id!==t.candidateId);
+  d.computationStatus='failed';d.selection.selectedCandidateId=null;d.selection.rankedCandidateIds=d.selection.rankedCandidateIds.filter(id=>id!==t.candidateId);d.selection.selectedCandidateId=d.selection.rankedCandidateIds[0]??null;
   for(const x of d.trials)if(x.preset===t.preset&&x.scenario===t.scenario)x.diagnostics.baselineDeltaUsd=null;
   const{reportId,generatedAt,...frozen}=d;d.reportId=createHash('sha256').update(JSON.stringify(frozen)).digest('hex');
   assert.equal(validateOptimization(d).trials.length,48);

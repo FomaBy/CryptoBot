@@ -30,7 +30,7 @@ export function validateOptimization(d, params = { studyId: STUDY_ID }) {
   shape(d, ['schemaVersion','source','chainId','preregistration','period','datasetId','evaluatorHash','sourceProfileHashes','computationStatus','evidenceStatus','coverage','grid','trials','selection','futureOos','unknowns','executionAuthorized','promotionAuthorized','reportId','generatedAt','assumptions','manifest']);
   check(d.schemaVersion === 'acs.optimization.v1' && d.chainId === 4663 && d.executionAuthorized === false && d.promotionAuthorized === false && d.evidenceStatus === 'insufficient_evidence');
   for (const k of ['reportId','datasetId','evaluatorHash']) hash(d[k]);
-  check(d.datasetId === DATASET); stamp(d.generatedAt);
+  check(d.datasetId === DATASET && d.evaluatorHash === '74994218cc539d214afc7316a70a93156f84c26d4b608a3f942de3cc895fc738'); stamp(d.generatedAt);
   shape(d.source,['id','revision']); check(d.source.id === 'ai-crypto-statistics' && (d.source.revision === null || /^[0-9a-f]{40}$/.test(d.source.revision)));
   shape(d.preregistration,['studyId','commit','manifestHash','registeredAt']);
   check(d.preregistration.studyId === STUDY_ID && d.preregistration.commit === COMMIT && d.preregistration.manifestHash === MANIFEST && d.preregistration.registeredAt === '2026-10-09T17:55:00.000Z');
@@ -87,6 +87,16 @@ export function validateOptimization(d, params = { studyId: STUDY_ID }) {
   check(s.procedure==='exploratory_min_preset_scenario_return_then_drawdown_v1' && s.recommendation==='no_promotion'); stamp(s.selectedAt); codes(s.reasonCodes);
   check(Array.isArray(s.rankedCandidateIds) && s.rankedCandidateIds.length<=8 && new Set(s.rankedCandidateIds).size===s.rankedCandidateIds.length && s.rankedCandidateIds.every(x=>candidates.has(x)));
   check(s.selectedCandidateId===null || candidates.has(s.selectedCandidateId));
+  // Independently verify the preregistered aggregate ranking using exact rational USD values.
+  const compare=(a,b)=>{const delta=a.n*b.d-b.n*a.d;return delta<0n?-1:delta>0n?1:0;};
+  const ranked=[...candidates].map(id=>{
+    const group=d.trials.filter(t=>t.candidateId===id);
+    if(group.some(t=>t.computationStatus!=='complete'||!t.metrics||t.metrics.closedTrades<1))return null;
+    const ratios=key=>group.map(t=>({n:units(t.metrics[key]),d:BigInt(t.preset)}));
+    return{id,worst:ratios('conservativeNetPnlUsd').sort(compare)[0],dd:ratios('maxDrawdownUsd').sort(compare).at(-1),unpriced:group.some(t=>t.metrics.unpricedPositions>0)};
+  }).filter(Boolean).sort((a,b)=>compare(b.worst,a.worst)||compare(a.dd,b.dd)||a.id.localeCompare(b.id));
+  check(JSON.stringify(s.rankedCandidateIds)===JSON.stringify(ranked.map(x=>x.id)));
+  const best=ranked[0];check(s.selectedCandidateId===(best&&best.worst.n>0n&&!best.unpriced?best.id:null));
   if (s.selectedCandidateId) check(d.trials.filter(t=>t.candidateId===s.selectedCandidateId).every(t=>t.computationStatus==='complete' && t.metrics?.closedTrades>0 && units(t.metrics.conservativeNetPnlUsd)>0n && t.metrics.unpricedPositions===0));
   const f=d.futureOos; shape(f,['status','eligibleAfter','embargoSec','alreadyViewedDataExcluded']); stamp(f.eligibleAfter);
   check(f.status==='not_started' && f.embargoSec===4500 && f.alreadyViewedDataExcluded===true && Date.parse(f.eligibleAfter)===Date.parse(s.selectedAt)+4500000);
@@ -115,7 +125,8 @@ function validateAssumptions(a) {
   shape(a.exits,['C','FIXED']);
   shape(a.exits.C,['kind','stopPct','timeMin','take1X','take1Frac','take2X','trailPct','runnerMaxMin']);
   shape(a.exits.FIXED,['kind','stopPct','timeMin','tpX']);
-  check(a.exits.C.kind==='C'&&a.exits.FIXED.kind==='FIXED');
+  for(const [key,value] of Object.entries({kind:'C',stopPct:40,timeMin:30,take1X:1.5,take1Frac:0.75,take2X:2,trailPct:20,runnerMaxMin:15}))check(a.exits.C[key]===value);
+  for(const [key,value] of Object.entries({kind:'FIXED',stopPct:40,timeMin:60,tpX:2}))check(a.exits.FIXED[key]===value);
   for(const x of Object.values(a.exits))for(const [k,v] of Object.entries(x))if(k!=='kind')check(Number.isFinite(v)&&v>=0&&v<=100000);
   codes(a.unsupportedGates);
   const g=a.guards;shape(g,['ratingVersions','canEnterRequired','stage','maxMarketCapUsd','rejectUnknown','maxGapSec','exitDelaySec','entrySizesUsd']);

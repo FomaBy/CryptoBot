@@ -12,8 +12,8 @@ from cpanel import CPANEL_USER, read_file, upload, queue_job
 
 BOT = Path(__file__).resolve().parents[1]
 FILES = {
-    'bot': ['server/app.js', 'server/backtests.js', 'server/backtest-store.js', 'web/index.html', 'web/app.js', 'web/styles.css'],
-    'acs': ['server/core/api.js', 'server/core/history-backtest.js', 'server/core/history-backtest-worker.js'],
+    'bot': ['server/app.js', 'server/backtests.js', 'server/backtest-store.js', 'server/optimizations.js', 'docs/research/optimization-envelope-v1.json', 'web/index.html', 'web/app.js', 'web/styles.css'],
+    'acs': ['server/core/api.js', 'server/core/history-backtest.js', 'server/core/history-backtest-worker.js', 'server/core/history-worker-pool.js', 'server/core/optimization.js', 'server/core/optimization-worker.js', 'server/core/optimization-api.js', 'server/core/optimization-study.js', 'server/config/optimization-envelope-v1.json'],
 }
 ROOTS = {'bot': 'cryptobot/app', 'acs': 'acs/app'}
 
@@ -79,7 +79,7 @@ def main():
             info = tarfile.TarInfo(name); info.size = len(data); info.mode = 0o600
             archive.addfile(info, io.BytesIO(data))
     body = package.getvalue(); sha = hashlib.sha256(body).hexdigest()
-    job = 'cryptobot-history-' + datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
+    job = 'cryptobot-optimization-' + datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
     upload(home + '/acs-ops', job + '.tar.gz', body)
     script = r'''set -eu
 umask 077
@@ -159,7 +159,7 @@ echo 'Integration activated __RELEASE__'
 '''.replace('__JOB__', job).replace('__SHA__', sha).replace('__RELEASE__', release)
     queue_job(job, script)
     result = {'job': job, 'release': release, 'revisions': revisions, 'bundleSha256': sha, 'bytes': len(body)}
-    output = BOT / 'artifacts/backtest-deployment.json'; output.write_text(json.dumps(result, indent=2)+'\n'); output.chmod(0o600)
+    output = BOT / 'artifacts/optimization-deployment.json'; output.write_text(json.dumps(result, indent=2)+'\n'); output.chmod(0o600)
     print(json.dumps(result))
 
 if __name__ == '__main__': main()

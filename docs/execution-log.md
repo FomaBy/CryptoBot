@@ -168,3 +168,7 @@ R-025/B-023 завершены для текущей функции исслед
 ## E-021 — 2026-10-09: preregistration оптимизации (R-026, B-024)
 
 Пользователь запросил улучшение прибыльности. До новых фактических прогонов зафиксированы [envelope](research/optimization-envelope-v1.json) и [методология](research/optimization-study.md): 48 оценок на прежнем cutoff 17:21 UTC, вся история exploratory. Проведён read-only разбор исходных расходов и задержек; параметры тарифа не изменены. Реальные trials ещё не запускались; baseline/evaluator review и deployment остаются впереди. Полные B-009/R-015 не объявляются выполненными.
+
+Независимый review параметризованного evaluator завершён до actual trials: causal checks, 48-grid, costs/caps/stress, dataset freeze и golden OLD9204180 на трёх бюджетах приняты. Evaluator SHA-256 `74994218cc539d214afc7316a70a93156f84c26d4b608a3f942de3cc895fc738`; private implementation `f7a9c20`. Включён только зарегистрированный offline study endpoint. Account API/UI и строгий публичный consumer реализованы; deployment/фактические результаты пока не заявляются.
+
+Локальные проверки текущего кода: 30/30 public bot tests, 48 targeted private tests до transport race fix и 26 повторных history/optimization tests после него. Исправление shared persistence promise сохраняет единый reportId/selectionAt для concurrent callers и disk winner; evaluator hash не изменился. UI synthetic QA 1440/700/390 пройден. Положительный production root login по-прежнему не проверен.

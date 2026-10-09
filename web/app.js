@@ -81,6 +81,7 @@
 
   function showLoggedOut() {
     btReset();
+    opReset();
     state.session = null;
     state.wallets = null;
     state.tasks = null;
@@ -125,7 +126,7 @@
       $("dashboard").hidden = false;
       syncControls();
       await refresh();
-      if (location.hash === "#research") { loadAnalyses(); btEnter(); }
+      if (location.hash === "#research") { loadAnalyses(); btEnter(); opEnter(); }
     } catch (error) {
       if (!$("login-link").hidden) return;
       $("gate-title").textContent = "Кабинет пока недоступен";
@@ -506,8 +507,8 @@
     Object.keys(TABS).forEach((key) => { $(`panel-${key}`).hidden = key !== tab; });
     $("breadcrumb-title").textContent = TABS[tab];
     document.title = `${TABS[tab]} · CryptoBot`;
-    if (tab === "research" && state.session?.authenticated) { if (!state.analysisStarted) loadAnalyses(); btEnter(); }
-    if (tab !== "research") btStopPolling();
+    if (tab === "research" && state.session?.authenticated) { if (!state.analysisStarted) loadAnalyses(); btEnter(); opEnter(); }
+    if (tab !== "research") { btStopPolling(); opStop(); }
   }
 
   const HASH_RE = /^[a-f0-9]{64}$/;
@@ -815,6 +816,90 @@
     try { const data = await api("/backtests", { method: "POST", body: bt.pending.body }); if (epoch !== bt.epoch) return; if (!runIdValid(data.run?.id)) throw new Error("Не получен идентификатор запуска. Обновите историю."); bt.pending = null; notice("bt-message", "Запуск сохранён. Итоговая достаточность данных отражается отдельно в отчёте."); await btLoadRuns(); await btSelectRun(data.run.id); }
     catch (error) { if (epoch === bt.epoch) notice("bt-message", `${errorMessage(error)} Обновите список. Повтор неизменённого запроса использует тот же ключ и не должен создавать дубликат.`, true); }
     finally { if (epoch === bt.epoch) { bt.busy = false; btSync(); } }
+  });
+
+  const STUDY_ID = "acs-entry65-exploratory-20261009-v1";
+  const op = { started: false, busy: false, runs: [], selected: null, epoch: 0, selection: 0, timer: null, pollUntil: 0, pendingKey: null, preset: "150", scenario: "base", trial: null };
+  function opStop() { clearTimeout(op.timer); op.timer = null; }
+  function opReset() { opStop(); op.epoch++; op.selection++; op.started = false; op.busy = false; op.runs = []; op.selected = null; op.pendingKey = null; op.trial = null; $("op-runs").replaceChildren(); $("op-report").replaceChildren(); $("op-start").disabled = true; }
+  function opName(trial) { const p = trial.parameters || {}; return `Оценка ≥${btValue(p.rating)} · ${p.exit === "C" ? "Частичный выход C" : p.exit === "FIXED" ? "Полный выход FIXED" : "Выход неизвестен"} · вход +${btValue(p.entryDelaySec)} с`; }
+  const opComputation = (status) => ({ complete: "Расчёт завершён", truncated: "Частичный расчёт", failed: "Ошибка вычисления" })[status] || "Вычисление не подтверждено";
+  const opStats = (value) => value ? `min ${btValue(value.min)} / median ${btValue(value.median)} / max ${btValue(value.max)} с` : "Неизвестно";
+  function opRenderRuns() {
+    const target = $("op-runs"); target.replaceChildren();
+    if (!op.runs.length) { target.append(node("p", "helper-text", "Сохранённых сравнений нет. Исследование не запускается автоматически.")); return; }
+    for (const run of op.runs) {
+      const row = node("div", `bt-run${op.selected?.id === run.id ? " selected" : ""}`); const button = node("button", "bt-run-select"); button.type = "button"; button.append(node("strong", "", btStatuses[run.status] || "Неизвестный статус"), node("span", "", `${btUtc(run.createdAt)} · ${btValue(run.params?.studyId)}`)); button.addEventListener("click", () => opSelect(run.id)); row.append(button);
+      if (["complete", "failed", "interrupted"].includes(run.status)) { const del = node("button", "button secondary small", "Удалить"); del.type = "button"; del.disabled = !can("boundedOptimization"); del.addEventListener("click", async () => { if (!window.confirm("Удалить сохранённое сравнение вместе с результатами его испытаний?")) return; del.disabled = true; const epoch = op.epoch; try { await api(`/optimizations/${encodeURIComponent(run.id)}`, { method: "DELETE" }); if (epoch !== op.epoch) return; if (op.selected?.id === run.id) { opStop(); op.selection++; op.selected = null; $("op-report").replaceChildren(); const url = new URL(location.href); url.searchParams.delete("studyRun"); history.replaceState(null, "", url.pathname + url.search + url.hash); } await opLoadRuns(); } catch (error) { if (epoch === op.epoch) { notice("op-message", errorMessage(error), true); del.disabled = false; } } }); row.append(del); }
+      target.append(row);
+    }
+  }
+  async function opLoadRuns() {
+    if (!state.session?.authenticated) return; const epoch = op.epoch; $("op-runs-refresh").disabled = true;
+    try { const data = await api("/optimizations"); if (epoch !== op.epoch) return; if (!Array.isArray(data.runs)) throw new Error("Некорректная история сравнений."); op.runs = data.runs; opRenderRuns(); }
+    catch (error) { if (epoch === op.epoch) notice("op-message", errorMessage(error), true); }
+    finally { if (epoch === op.epoch) $("op-runs-refresh").disabled = false; }
+  }
+  function opRenderReport() {
+    const run = op.selected; const target = $("op-report"); target.replaceChildren(); if (!run) return;
+    const heading = node("div", "bt-history-head"); heading.append(node("h3", "", btStatuses[run.status] || "Неизвестный статус")); const refresh = node("button", "button secondary small", "Обновить сравнение"); refresh.type = "button"; refresh.addEventListener("click", () => opSelect(run.id)); heading.append(refresh); target.append(heading, node("p", "helper-text", `Run ${run.id} · ${btUtc(run.createdAt)}`));
+    if (run.error) target.append(node("p", "analysis-gate", typeof run.error === "string" ? run.error : JSON.stringify(run.error)));
+    const r = run.report;
+    if (!r) { target.append(node("p", "helper-text", run.status === "running" ? "Ожидаем 48 результатов. Проверка статуса каждые 3 секунды, максимум 2 минуты. Затем обновление вручную." : "Отчёт отсутствует. Лучший вариант не определён.")); return; }
+    if (r.schemaVersion !== "acs.optimization.v1" || r.chainId !== CHAIN_ID || r.executionAuthorized !== false || r.promotionAuthorized !== false || !Array.isArray(r.trials)) { target.append(node("p", "analysis-gate", "Неподдерживаемая схема исследования. Результаты не показаны.")); return; }
+    const selected = r.trials.find((t) => t.candidateId === r.selection?.selectedCandidateId);
+    target.append(node("p", "helper-text", `Вычисление: ${opComputation(r.computationStatus)}. Сохранено испытаний: ${r.trials.length} из ${btValue(r.grid?.trialCount)}.`));
+    target.append(node("p", "analysis-gate", "Доказательств исполнимости недостаточно. Все варианты используют уже просмотренную историю. Повторные пути сделок не являются независимыми подтверждениями. Продвижение и live отключены."));
+    target.append(node("h3", "op-selection", selected ? `Гипотеза источника: ${opName(selected)}` : "Источник предпочитает отсутствие торговли"));
+    target.append(node("p", "helper-text", selected ? "Это предложение для будущей проверки. Положительный исторический результат не подтверждает преимущество на новых данных." : "Источник не выбрал вариант, проходящий его исследовательское сравнение. Все результаты доступны ниже."));
+    const meta = node("dl", "analysis-facts");
+    for (const [label, value] of [["Начало запрошенного окна", btUtc(r.period?.requestedFrom)], ["Начало доступной истории", btUtc(r.period?.from)], ["Конец UTC, не включая", btUtc(r.period?.end)], ["Будущий OOS", r.futureOos?.status === "not_started" ? "Не начат" : btValue(r.futureOos?.status)], ["Не ранее UTC", btUtc(r.futureOos?.eligibleAfter)], ["Embargo, секунд", r.futureOos?.embargoSec], ["Просмотренная история исключена из будущего OOS", r.futureOos?.alreadyViewedDataExcluded === true ? "Да, по плану источника" : "Не подтверждено"]]) sourceFact(meta, label, value);
+    target.append(meta);
+    const baseAssumptions = r.assumptions?.baseByPreset?.find((x) => Number(x.preset) === Number(op.preset)) || r.assumptions?.baseByPreset?.[0];
+    if (baseAssumptions?.C) target.append(btAssumptions(baseAssumptions.C));
+    target.append(btJson("Профили C / FIXED и стресс-допущения для всех бюджетов", r.assumptions));
+    const controls = node("div", "op-filters");
+    for (const [key, label, choices] of [["preset", "Капитал USD", [["150", "150 / вход 10"], ["1000", "1 000 / вход 50"], ["5000", "5 000 / вход 250"], ["all", "Все бюджеты"]]], ["scenario", "Сценарий", [["base", "Базовые расходы"], ["stress", "Стресс расходов и задержек"], ["all", "Все сценарии"]]]]) {
+      const wrapper = node("label", "form-label", label); const select = node("select"); select.id = `op-filter-${key}`; choices.forEach(([value, caption]) => { const option = node("option", "", caption); option.value = value; select.append(option); }); select.value = op[key]; select.addEventListener("change", () => { op[key] = select.value; op.trial = null; opRenderReport(); document.getElementById(`op-filter-${key}`)?.focus({ preventScroll: true }); }); wrapper.append(select); controls.append(wrapper);
+    }
+    target.append(controls);
+    const trials = r.trials.filter((t) => (op.preset === "all" || Number(t.preset) === Number(op.preset)) && (op.scenario === "all" || t.scenario === op.scenario));
+    const sameBudgetStress = r.trials.filter((t) => t.scenario === "stress" && (op.preset === "all" || Number(t.preset) === Number(op.preset)) && typeof t.metrics?.conservativeNetPnlUsd === "string");
+    const stressByBudget = [150, 1000, 5000].filter((p) => op.preset === "all" || Number(op.preset) === p).map((p) => { const group = sameBudgetStress.filter((t) => t.preset === p); const worst = group.reduce((a, t) => !a || Number(t.metrics.conservativeNetPnlUsd) < Number(a.metrics.conservativeNetPnlUsd) ? t : a, null); return `${p} USD: ${worst ? btMoney(worst.metrics.conservativeNetPnlUsd) : "неизвестно"}`; });
+    target.append(node("p", "analysis-gate", `Baseline без торговли: 0 USD в этой модели, без расходов сервиса. Самый низкий stress net среди вариантов по бюджету: ${stressByBudget.join("; ")}. Champion для сравнения: оценка 65, C, задержка 5 секунд. Издержки уже включены в net.`));
+    target.append(node("p", "helper-text", `Показано ${trials.length} из ${r.trials.length} испытаний. Фильтр не удаляет остальные результаты. Изменение фильтра не запускает расчёт.`));
+    const wrap = node("div", "bt-table-wrap op-table-wrap"); wrap.tabIndex = 0; wrap.setAttribute("role", "region"); wrap.setAttribute("aria-label", "Все испытания исследования"); const table = node("table", "bt-table op-table"); table.append(node("caption", "sr-only", "Результаты всех фиксированных испытаний")); const thead = node("thead"), hr = node("tr");
+    for (const label of ["Вариант", "Бюджет / сценарий", "Вычисление", "Консервативный net USD", "Δ к champion USD", "Издержки USD", "Просадка USD", "Позиций / без цены", "Диагностика"]) { const th = node("th", "", label); th.scope = "col"; hr.append(th); } thead.append(hr); const tbody = node("tbody");
+    for (const trial of trials) {
+      const row = node("tr"); const m = trial.metrics; const champion = trial.parameters?.rating === 65 && trial.parameters?.exit === "C" && trial.parameters?.entryDelaySec === 5;
+      const values = [opName(trial) + (champion ? " · champion" : ""), `${btValue(trial.preset)} / ${trial.scenario === "stress" ? "stress" : trial.scenario === "base" ? "base" : btValue(trial.scenario)}`, opComputation(trial.computationStatus), btMoney(m?.conservativeNetPnlUsd), btMoney(trial.diagnostics?.baselineDeltaUsd), btMoney(m?.totalCostsUsd), btMoney(m?.maxDrawdownUsd), `${btValue(m?.tradeCount)} / ${btValue(m?.unpricedPositions)}`]; values.forEach((value) => row.append(node("td", "", value)));
+      const td = node("td"); const open = node("button", "button secondary small", "Подробнее"); open.type = "button"; open.addEventListener("click", () => { op.trial = trial.trialId; opRenderReport(); $("op-trial-detail")?.scrollIntoView({ block: "nearest" }); }); td.append(open); row.append(td); tbody.append(row);
+    }
+    table.append(thead, tbody); wrap.append(table); target.append(wrap);
+    const trial = r.trials.find((t) => t.trialId === op.trial);
+    if (trial) {
+      const detail = node("section", "op-trial-detail"); detail.id = "op-trial-detail"; detail.tabIndex = -1; detail.append(node("h3", "", `${opName(trial)} · ${trial.preset} USD / ${trial.scenario}`)); const d = trial.diagnostics || {}, m = trial.metrics || {};
+      const samePaths = d.behaviorHash ? r.trials.filter((x) => x.diagnostics?.behaviorHash === d.behaviorHash).length : null;
+      const facts = node("dl", "analysis-facts");
+      for (const [label, value] of [["Результат вычисления", opComputation(trial.computationStatus)], ["Доказательства", trial.evidenceStatus === "insufficient_evidence" ? "Недостаточно для исполнимости" : trial.evidenceStatus], ["Ошибка", trial.error || "Источник не сообщил ошибку"], ["Net к baseline без торговли", btMoney(m.conservativeNetPnlUsd)], ["Economic net", btMoney(m.economicNetPnlUsd)], ["Реализованный PnL", btMoney(m.realizedPnlUsd)], ["Нереализованное списание", btMoney(m.unrealizedWriteDownUsd)], ["Net + модельные расходы", btMoney(m.accountingPriceContributionUsd)], ["Фактическая задержка входа", opStats(d.entryDelaySec)], ["Задержка финального выхода", opStats(d.finalExitDelaySec)], ["Длительность позиции", opStats(d.holdingSecs)], ["Повторяющийся путь", samePaths === null ? null : `${samePaths} испытаний имеют тот же behaviorHash; это не независимые наблюдения`]]) sourceFact(facts, label, value);
+      detail.append(facts, node("p", "analysis-gate", "Net + расходы — бухгалтерское разложение исходного результата, не отдельный прогон без комиссий и не исполнимая прибыль."), btJson("Пропуски и диагностика", d), btJson("Все метрики и версии испытания", trial)); target.append(detail);
+    }
+    target.append(btJson("Покрытие, ограничения и неизвестные данные", { coverage: r.coverage, unknowns: r.unknowns }), btJson("Регистрация, версии, выбор гипотезы и будущий OOS", { reportId: r.reportId, datasetId: r.datasetId, source: r.source, evaluatorHash: r.evaluatorHash, preregistration: r.preregistration, manifest: r.manifest, grid: r.grid, selection: r.selection, futureOos: r.futureOos, sourceProfileHashes: r.sourceProfileHashes, generatedAt: r.generatedAt, executionAuthorized: r.executionAuthorized, promotionAuthorized: r.promotionAuthorized }));
+  }
+  async function opSelect(id, polling = false) {
+    if (!state.session?.authenticated || !runIdValid(id)) { if (id) notice("op-message", "Некорректный идентификатор сравнения.", true); return; }
+    opStop(); const epoch = op.epoch, selection = polling ? op.selection : ++op.selection; if (!polling) { op.pollUntil = Date.now() + 120000; op.trial = null; }
+    try { const data = await api(`/optimizations/${encodeURIComponent(id)}`); if (epoch !== op.epoch || selection !== op.selection) return; if (data.run?.id !== id) throw new Error("Сервер вернул другое сравнение."); op.selected = data.run; op.runs = op.runs.map((r) => r.id === id ? { ...r, status: data.run.status } : r); const url = new URL(location.href); url.searchParams.set("studyRun", id); history.replaceState(null, "", url.pathname + url.search + url.hash); opRenderRuns(); opRenderReport();
+      if (data.run.status === "running" && location.hash === "#research") { if (Date.now() < op.pollUntil) op.timer = setTimeout(() => opSelect(id, true), 3000); else notice("op-message", "Проверка статуса остановлена через 2 минуты. Обновите сравнение вручную; серверный расчёт может продолжаться."); }
+    } catch (error) { if (epoch === op.epoch && selection === op.selection) notice("op-message", errorMessage(error), true); }
+  }
+  function opEnter() { if (!state.session?.authenticated || op.started) return; op.started = true; $("op-start").disabled = !can("boundedOptimization"); opLoadRuns(); const id = new URLSearchParams(location.search).get("studyRun"); if (id) opSelect(id); }
+  $("op-runs-refresh").addEventListener("click", opLoadRuns);
+  $("op-start").addEventListener("click", async () => {
+    if (!can("boundedOptimization") || op.busy) return; const epoch = op.epoch; op.busy = true; $("op-start").disabled = true; op.pendingKey ||= crypto.randomUUID(); notice("op-message", "Сохраняем запрос фиксированного исследования…");
+    try { const data = await api("/optimizations", { method: "POST", body: { studyId: STUDY_ID, idempotencyKey: op.pendingKey } }); if (epoch !== op.epoch) return; if (!runIdValid(data.run?.id)) throw new Error("Идентификатор сравнения не получен. Обновите список."); op.pendingKey = null; notice("op-message", "Сравнение сохранено. Гипотезы не получают торговых полномочий."); await opLoadRuns(); await opSelect(data.run.id); }
+    catch (error) { if (epoch === op.epoch) notice("op-message", `${errorMessage(error)} Обновите список. Повтор запроса сохранит тот же ключ защиты от дубликатов.`, true); }
+    finally { if (epoch === op.epoch) { op.busy = false; $("op-start").disabled = !can("boundedOptimization"); } }
   });
 
   window.addEventListener("hashchange", selectTab);

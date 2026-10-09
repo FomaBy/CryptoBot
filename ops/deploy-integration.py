@@ -12,9 +12,8 @@ from cpanel import CPANEL_USER, read_file, upload, queue_job
 
 BOT = Path(__file__).resolve().parents[1]
 FILES = {
-    'bot': ['server/app.js', 'server/analyses.js', 'web/index.html', 'web/app.js', 'web/styles.css'],
-    'acs': ['server/core/api.js', 'server/core/token-analysis.js', 'public/index.html', 'public/drawer.js',
-            'public/i18n.js', 'public/analysis.html', 'public/analysis.js', 'public/analysis.css'],
+    'bot': ['server/app.js', 'server/backtests.js', 'server/backtest-store.js', 'web/index.html', 'web/app.js', 'web/styles.css'],
+    'acs': ['server/core/api.js', 'server/core/history-backtest.js', 'server/core/history-backtest-worker.js'],
 }
 ROOTS = {'bot': 'cryptobot/app', 'acs': 'acs/app'}
 
@@ -42,7 +41,14 @@ def main():
             if file.is_file(): digest.update(str(file.relative_to(BOT)).encode() + b'\0' + file.read_bytes())
     release = 'web-' + digest.hexdigest()[:16]
     home = '/home/' + CPANEL_USER
-    manifest = {'release': release, 'revisions': revisions, 'files': [], 'expectedMarkers': {}}
+    manifest = {'release': release, 'revisions': revisions, 'files': [], 'expectedMarkers': {}, 'readOnlyDependencies': []}
+    for relative in ['server/config/paper.js', 'server/core/strategy-rules.js', 'server/core/strategy-features.js', 'server/core/token-analysis.js', 'public/strategy-params.js']:
+        target = Path(relative)
+        remote = read_file(home + '/acs/app/' + str(target.parent), target.name).encode()
+        reviewed = subprocess.check_output(['git', 'show', bases['acs'] + ':' + relative], cwd=roots['acs'])
+        if remote != reviewed:
+            raise SystemExit('ACS runtime dependency differs from reviewed base: ' + relative)
+        manifest['readOnlyDependencies'].append({'path': relative, 'sha256': hashlib.sha256(remote).hexdigest()})
     payloads = {}
     for app, files in FILES.items():
         marker = 'RELEASE' if app == 'bot' else 'DEPLOYED.txt'
@@ -73,7 +79,7 @@ def main():
             info = tarfile.TarInfo(name); info.size = len(data); info.mode = 0o600
             archive.addfile(info, io.BytesIO(data))
     body = package.getvalue(); sha = hashlib.sha256(body).hexdigest()
-    job = 'cryptobot-shared-' + datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
+    job = 'cryptobot-history-' + datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
     upload(home + '/acs-ops', job + '.tar.gz', body)
     script = r'''set -eu
 umask 077
@@ -94,6 +100,8 @@ def target(row):
  return p
 def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
 if action=='check':
+ for row in manifest['readOnlyDependencies']:
+  if digest(roots['acs']/row['path'])!=row['sha256']: raise SystemExit('ACS runtime dependency changed')
  for app,value in manifest['expectedMarkers'].items():
   marker='RELEASE' if app=='bot' else 'DEPLOYED.txt'
   if (roots[app]/marker).read_text()!=value: raise SystemExit('Deployment marker changed; review before retry')
@@ -114,6 +122,15 @@ elif action=='rollback':
   elif row['before'] is None and p.exists(): p.unlink()
 PY
 python3 "$BASE/apply.py" "$BASE" check
+python3 - "$BACKUP" <<'PY'
+import sqlite3,sys
+from pathlib import Path
+source=Path.home()/'cryptobot/state/app.sqlite'
+if source.exists():
+ src=sqlite3.connect('file:'+str(source)+'?mode=ro',uri=True,timeout=5)
+ dst=sqlite3.connect(str(Path(sys.argv[1])/'account-before.sqlite'))
+ src.backup(dst);dst.close();src.close()
+PY
 rollback() {
   python3 "$BASE/apply.py" "$BASE" rollback
   /usr/sbin/cloudlinux-selector restart --json --interpreter=nodejs --app-root=acs/app >/dev/null
@@ -142,7 +159,7 @@ echo 'Integration activated __RELEASE__'
 '''.replace('__JOB__', job).replace('__SHA__', sha).replace('__RELEASE__', release)
     queue_job(job, script)
     result = {'job': job, 'release': release, 'revisions': revisions, 'bundleSha256': sha, 'bytes': len(body)}
-    output = BOT / 'artifacts/shared-deployment.json'; output.write_text(json.dumps(result, indent=2)+'\n'); output.chmod(0o600)
+    output = BOT / 'artifacts/backtest-deployment.json'; output.write_text(json.dumps(result, indent=2)+'\n'); output.chmod(0o600)
     print(json.dumps(result))
 
 if __name__ == '__main__': main()

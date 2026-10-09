@@ -78,6 +78,14 @@ Search envelope фиксирует разрешённые признаки/оп�
 | R-023 | Единый источник анализа ACS для двух страниц. U7. DONE — текущая published projection, E-017 | Анализ строится только существующим ACS engine; общий API проецирует опубликованные значения, не вызывает LLM/providers/watch и не пересчитывает score. Обе страницы показывают одинаковые snapshot ID, token identity, analysis ID/version, source revision и observation timestamps. Ссылка на точный сохранённый снимок возвращает его либо явный 410; не подменяется latest. |
 | R-024 | Разделить общий анализ и приватные полномочия. U7, R-005,021. DONE — integration boundary, E-017; R-005 остаётся PARTIAL | Canonical endpoint всегда использует фиксированный публичный allowlist, независимо от ACS owner cookie/loopback/настройки private names. Wallet identities/feed, account tasks, secrets и private source отсутствуют. Bot proxy проверяет root session, не пересылает cookies и отклоняет неизвестные поля/цепочки/формат. В интерфейсе бота только reported Pons на 4663; label не доказывает registry/sellability. Аналитика не разрешает торговлю. |
 
+## Исторический прогон
+
+Дополнение U8: пользователь запросил прогон за последние две недели «как будто торговал бы» и выбрал правила текущей статистики ACS.
+
+| ID | Требование, источник, статус | Критерий приёмки |
+|---|---|---|
+| R-025 | Исторический прогон текущего ACS-профиля. U8. IN_PROGRESS | Из кабинета запускается и сохраняется аккаунтный отчёт с USD presets 150/10, 1000/50, 5000/250, точным UTC окном последних 14 дней, frozen source profile и исполненной model version. При неполном покрытии полный результат не выдумывается: доступный период выбирается пользователем явно. Сценарий по сохранённым наблюдениям отделён от доказанной исполнимости и точного воспроизведения всех live gates. Отчёт показывает coverage, gaps/caps, costs, ledger, cash, partial exits, conservative write-down, equity/drawdown, no-trade baseline и unknowns. Causal tests запрещают будущие признаки/мгновенные выходы; account tests проверяют доступ, CSRF, idempotency и restart/limits. Live/paper/AI не включаются. |
+
 ## Открытые решения
 
 1. Месячный операционный бюджет AI/данных/RPC ещё не утверждён; создание сайта не разрешает неограниченные платные workers. Multiuser уже выбран и больше не является открытым решением.

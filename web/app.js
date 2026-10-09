@@ -58,7 +58,7 @@
     }
     if (options.body !== undefined) headers["Content-Type"] = "application/json";
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 20000);
     let response;
     let body;
     try {
@@ -80,6 +80,7 @@
   }
 
   function showLoggedOut() {
+    btReset();
     state.session = null;
     state.wallets = null;
     state.tasks = null;
@@ -124,7 +125,7 @@
       $("dashboard").hidden = false;
       syncControls();
       await refresh();
-      if (location.hash === "#research") loadAnalyses();
+      if (location.hash === "#research") { loadAnalyses(); btEnter(); }
     } catch (error) {
       if (!$("login-link").hidden) return;
       $("gate-title").textContent = "Кабинет пока недоступен";
@@ -505,7 +506,8 @@
     Object.keys(TABS).forEach((key) => { $(`panel-${key}`).hidden = key !== tab; });
     $("breadcrumb-title").textContent = TABS[tab];
     document.title = `${TABS[tab]} · CryptoBot`;
-    if (tab === "research" && state.session?.authenticated && !state.analysisStarted) loadAnalyses();
+    if (tab === "research" && state.session?.authenticated) { if (!state.analysisStarted) loadAnalyses(); btEnter(); }
+    if (tab !== "research") btStopPolling();
   }
 
   const HASH_RE = /^[a-f0-9]{64}$/;
@@ -657,6 +659,163 @@
       }
     }
   }
+
+  const bt = { started: false, coverage: null, runs: [], selected: null, busy: false, loadingCoverage: false, epoch: 0, selection: 0, timer: null, pollUntil: 0, pending: null };
+  const runIdValid = (id) => typeof id === "string" && /^[a-f0-9-]{36}$/i.test(id);
+  const btUtc = (value) => { if (value === null || value === undefined || value === "") return "Неизвестно"; const d = new Date(value); return Number.isFinite(d.getTime()) ? d.toISOString().replace("T", " ").replace(/Z$/, " UTC") : "Неизвестно"; };
+  const btValue = (value) => value === null || value === undefined || value === "" ? "Неизвестно" : String(value);
+  const btMoney = (value) => typeof value === "string" && /^-?\d+(?:\.\d+)?$/.test(value) ? `${value} USD` : "Неизвестно";
+  const btWindow = () => document.querySelector('input[name="bt-window"]:checked').value;
+  const btStatuses = { running: "Расчёт выполняется", complete: "Расчёт завершён", failed: "Ошибка расчёта", interrupted: "Расчёт прерван" };
+  function btStopPolling() { clearTimeout(bt.timer); bt.timer = null; }
+  function btReset() {
+    btStopPolling(); bt.epoch++; bt.selection++; bt.started = false; bt.coverage = null; bt.selected = null; bt.runs = []; bt.busy = false; bt.loadingCoverage = false; bt.pending = null;
+    $("bt-report").replaceChildren(); $("bt-runs").replaceChildren(); $("bt-coverage").replaceChildren(); btSync();
+  }
+  function btSync() {
+    const enabled = can("historicalBacktest");
+    const full = bt.coverage?.coverage?.fullWindow === true;
+    const shortScenario = $("bt-mode").value === "scenario" && btWindow() === "14d" && !full;
+    const noAvailable = btWindow() === "available" && (!bt.coverage?.coverage?.rows || bt.coverage?.coverage?.firstAt == null);
+    $("bt-submit").disabled = !enabled || !bt.coverage || bt.busy || bt.loadingCoverage || shortScenario || noAvailable;
+    $("bt-coverage-refresh").disabled = !enabled || bt.loadingCoverage || bt.busy;
+    $("bt-preset").disabled = !enabled || bt.busy || bt.loadingCoverage;
+    $("bt-mode").disabled = !enabled || bt.busy;
+    $("bt-window-options").disabled = !enabled || !bt.coverage || bt.busy || bt.loadingCoverage;
+    $("bt-submit").textContent = bt.busy ? "Сохраняем запуск…" : $("bt-mode").value === "scenario" ? "Посчитать сделки по истории" : "Проверить, хватает ли данных";
+    $("bt-submit-hint").textContent = !enabled ? "Запуски недоступны для этой сессии." : shortScenario ? "Для сценария выберите доступную историю явно либо дождитесь полного окна." : noAvailable ? "Нет доступной истории для этого периода." : "Новый запуск сохранится в вашем аккаунте.";
+    $("bt-scope-note").textContent = $("bt-mode").value === "scenario" ? "Сценарий использует записанные наблюдения и приближение профиля ACS. История migration timing, hard knife и devDump может отсутствовать: полная стратегия не воспроизводится. Выбор доступной истории не превращает её в 14-дневный тест." : "Строгая проверка сохраняет исходные границы и пробелы. Недостаточные данные не дают результата доходности. Завершённый расчёт не означает достаточное доказательство.";
+  }
+  function btJson(title, value) {
+    const details = node("details", "analysis-details"); details.append(node("summary", "", title));
+    const pre = node("pre", "bt-json", JSON.stringify(value ?? null, null, 2)); pre.tabIndex = 0; details.append(pre); return details;
+  }
+  function btTable(title, headers, rows) {
+    const details = node("details", "analysis-details"); details.append(node("summary", "", `${title} · ${rows.length}`));
+    if (!rows.length) { details.append(node("p", "helper-text", "Записей нет. Отсутствие записей не доказывает отсутствие риска.")); return details; }
+    const wrap = node("div", "bt-table-wrap"); wrap.tabIndex = 0; wrap.setAttribute("role", "region"); wrap.setAttribute("aria-label", title);
+    const table = node("table", "bt-table"); const caption = node("caption", "sr-only", title); const head = node("thead"); const hr = node("tr");
+    headers.forEach((label) => { const th = node("th", "", label); th.scope = "col"; hr.append(th); }); head.append(hr);
+    const body = node("tbody"); rows.forEach((values) => { const tr = node("tr"); values.forEach((value) => tr.append(node("td", "", btValue(value)))); body.append(tr); });
+    table.append(caption, head, body); wrap.append(table); details.append(wrap); return details;
+  }
+  function btCoverageView(report) {
+    const wrap = node("div", "bt-coverage-content"); const c = report.coverage || {}; const p = report.period || {};
+    wrap.append(node("strong", "", c.fullWindow === true ? "Источник отмечает полное окно наблюдений" : "Покрытие 14 дней не подтверждено"));
+    const facts = node("dl", "analysis-facts");
+    for (const [label, value] of [["Запрошено с UTC", btUtc(p.requestedFrom)], ["Фактическое начало UTC", btUtc(p.from)], ["Конец UTC, не включая", btUtc(p.end)], ["Первое / последнее наблюдение", `${btUtc(c.firstAt)} / ${btUtc(c.lastAt)}`], ["Наблюдения / токены", `${btValue(c.rows)} / ${btValue(c.tokens)}`], ["Rated / priced / liquid", `${btValue(c.rated)} / ${btValue(c.priced)} / ${btValue(c.liquid)}`], ["Максимальный пробел, секунд", c.maxGapSec], ["Пропущенные дни", Array.isArray(c.missingDays) ? c.missingDays.join(", ") || "Нет по данным источника" : c.missingDays], ["Ограничение выборки", c.truncated === true ? "Выборка усечена" : c.truncated === false ? "Источник не отмечает усечения" : null], ["Выбрано / всего строк", `${btValue(c.selectedRows)} / ${btValue(c.totalRows)}`], ["Исключено токенов", c.excludedTokens]]) sourceFact(facts, label, value);
+    wrap.append(facts);
+    if (Array.isArray(c.reasons) && c.reasons.length) wrap.append(node("p", "analysis-gate", `Ограничения источника: ${c.reasons.join(", ")}`));
+    if (Array.isArray(c.daily)) wrap.append(btTable("Покрытие по дням UTC", ["День", "Строки", "Токены", "Оценки", "Цены", "Ликвидность"], c.daily.map((x) => [x.day, x.rows, x.tokens, x.rated, x.priced, x.liquid])));
+    return wrap;
+  }
+  async function btLoadCoverage() {
+    if (!can("historicalBacktest") || bt.busy || bt.loadingCoverage) return;
+    const epoch = bt.epoch; const preset = Number($("bt-preset").value); bt.loadingCoverage = true; bt.coverage = null; bt.pending = null; btSync(); notice("bt-message", "Проверяем доступную историю. Расчёт стратегии не запускается.");
+    try {
+      const report = await api(`/backtests/coverage?preset=${preset}`, { timeoutMs: 110000 });
+      if (epoch !== bt.epoch) return;
+      if (report.schemaVersion !== "acs.backtest.v1" || report.chainId !== CHAIN_ID || report.executionAuthorized !== false || !Number.isFinite(Date.parse(report.period?.end))) throw new Error("Источник вернул неподдерживаемый отчёт покрытия.");
+      bt.coverage = report; $("bt-coverage").replaceChildren(btCoverageView(report));
+      $("bt-full-period").textContent = `${btUtc(report.period.requestedFrom)} → ${btUtc(report.period.end)} (конец не включая)`;
+      $("bt-available-period").textContent = `${btUtc(report.coverage?.firstAt)} → ${btUtc(report.period.end)} (конец не включая)`;
+      notice("bt-message", "Покрытие проверено. Проверьте период и допущения перед запуском.");
+      $("bt-coverage").append(btAssumptions(report.assumptions));
+    } catch (error) { if (epoch === bt.epoch) { $("bt-coverage").replaceChildren(node("p", "helper-text", "Покрытие недоступно. Сохранённые отчёты остаются в истории.")); notice("bt-message", errorMessage(error), true); } }
+    finally { if (epoch === bt.epoch) { bt.loadingCoverage = false; btSync(); } }
+  }
+  function btAssumptions(a = {}) {
+    const box = node("div", "bt-assumptions"); box.append(node("h3", "", "Допущения расчёта"));
+    box.append(node("p", "analysis-gate", "Налоги, комиссии и проскальзывание — модель, не подтверждённый тариф конкретного токена. В ACS может применяться fallback tax 10% на каждую сторону. Полный профиль стратегии и ограничения смотрите ниже."));
+    const facts = node("dl", "analysis-facts");
+    for (const [label, value] of [["Стратегия", a.strategy], ["Версия стратегии", a.strategyVersion], ["Версия расходов", a.costVersion], ["Капитал / вход USD", `${btValue(a.initialUsd)} / ${btValue(a.entryUsd)}`], ["Fee, %", a.feePct], ["Tax, % на сторону", a.taxPct], ["Slippage, %", a.slippagePct], ["Gas USD", a.gasUsd], ["Задержка входа / выхода, с", `${btValue(a.delaySec)} / ${btValue(a.exitDelaySec)}`]]) sourceFact(facts, label, typeof value === "object" && value !== null ? JSON.stringify(value) : value);
+    box.append(facts); if (a.profileApproximation === true) box.append(node("p", "analysis-gate", `Приближение профиля ${btValue(a.profile?.id || a.strategy)} · выход ${btValue(a.profile?.exit?.kind)}. Невоспроизводимые проверки: ${Array.isArray(a.unsupportedGates) ? a.unsupportedGates.join(", ") : "Неизвестно"}. Лимиты сценария не являются утверждёнными live-лимитами.`)); box.append(btJson("Полные параметры и ограничения модели", a)); return box;
+  }
+  function btRenderRuns() {
+    const list = $("bt-runs"); list.replaceChildren();
+    if (!bt.runs.length) { list.append(node("p", "helper-text", "Сохранённых запусков нет. Нажатие кнопки запуска создаст первый отчёт.")); return; }
+    for (const run of bt.runs) {
+      const row = node("div", `bt-run${bt.selected?.id === run.id ? " selected" : ""}`); const button = node("button", "bt-run-select"); button.type = "button";
+      button.append(node("strong", "", `${btStatuses[run.status] || "Неизвестный статус"} · ${btValue(run.params?.preset)} USD`), node("span", "", `${btUtc(run.createdAt)} · ${run.params?.mode === "scenario" ? "Расчёт сделок по истории" : "Проверка достаточности данных"} · ${run.params?.window === "available" ? "Доступная история" : "14 дней"}`));
+      button.addEventListener("click", () => btSelectRun(run.id)); row.append(button);
+      if (["complete", "failed", "interrupted"].includes(run.status)) { const del = node("button", "button secondary small", "Удалить"); del.type = "button"; del.disabled = !can("historicalBacktest"); del.addEventListener("click", async () => { if (!window.confirm("Удалить этот сохранённый запуск?")) return; del.disabled = true; try { await api(`/backtests/${encodeURIComponent(run.id)}`, { method: "DELETE" }); if (bt.selected?.id === run.id) { btStopPolling(); bt.selection++; bt.selected = null; $("bt-report").replaceChildren(); const u = new URL(location.href); u.searchParams.delete("run"); history.replaceState(null, "", u.pathname + u.search + u.hash); } await btLoadRuns(); } catch (error) { notice("bt-message", errorMessage(error), true); del.disabled = false; } }); row.append(del); }
+      list.append(row);
+    }
+  }
+  async function btLoadRuns() {
+    if (!state.session?.authenticated) return; const epoch = bt.epoch; $("bt-runs-refresh").disabled = true;
+    try { const data = await api("/backtests"); if (epoch !== bt.epoch) return; if (!Array.isArray(data.runs)) throw new Error("Некорректная история запусков."); bt.runs = data.runs; btRenderRuns(); }
+    catch (error) { if (epoch === bt.epoch) notice("bt-message", errorMessage(error), true); }
+    finally { if (epoch === bt.epoch) $("bt-runs-refresh").disabled = false; }
+  }
+  function btRenderReport() {
+    const run = bt.selected; const target = $("bt-report"); target.replaceChildren(); if (!run) return;
+    const heading = node("div", "bt-history-head"); heading.append(node("h3", "", btStatuses[run.status] || "Неизвестный статус")); const refresh = node("button", "button secondary small", "Обновить отчёт"); refresh.type = "button"; refresh.addEventListener("click", () => btSelectRun(run.id)); heading.append(refresh); target.append(heading);
+    target.append(node("p", "helper-text", `Run ${run.id} · ${btUtc(run.createdAt)} · завершён: ${btUtc(run.finishedAt)}`));
+    if (run.error) target.append(node("p", "analysis-gate", `Ошибка: ${typeof run.error === "string" ? run.error : JSON.stringify(run.error)}`));
+    const r = run.report;
+    if (!r) { target.append(node("p", "helper-text", run.status === "running" ? "Ожидаем отчёт. Статус проверяется каждые 3 секунды, не более 2 минут; затем обновление вручную." : "Отчёт не получен. Доходность неизвестна.")); return; }
+    if (r.schemaVersion !== "acs.backtest.v1" || r.chainId !== CHAIN_ID || r.executionAuthorized !== false) { target.append(node("p", "analysis-gate", "Схема отчёта не поддерживается. Результаты не показаны.")); return; }
+    const reportStatuses = { coverage_only: "Проверено только покрытие", insufficient_evidence: "Доказательств исполнимости недостаточно", scenario_complete: "Сценарный расчёт готов" };
+    const computationLabel = r.computationStatus === "complete" ? "Расчёт завершён" : r.computationStatus === "truncated" ? "Расчёт ограничен: обработана часть данных" : "Статус вычисления не указан";
+    target.append(node("p", "helper-text", `Вычисление: ${computationLabel}.`));
+    target.append(node("p", "analysis-gate", `${reportStatuses[r.status] || btValue(r.status)}. Это исторический эксперимент с допущениями. Статус «расчёт завершён» не доказывает полноту истории, независимый OOS или готовность live.`));
+    target.append(btCoverageView(r), btAssumptions(r.assumptions));
+    if (r.result) {
+      const v = r.result; const metrics = node("dl", "bt-result-metrics");
+      for (const [label, value] of [["Net PnL по модели", v.netPnlUsd], ["Реализованный PnL", v.realizedPnlUsd], ["Списание незакрытых позиций", v.unrealizedWriteDownUsd], ["Консервативный net PnL", v.conservativeNetPnlUsd], ["Economic net PnL", v.economicNetPnlUsd], ["Baseline без торговли", v.noTradePnlUsd], ["Учтённые расходы", v.totalCostsUsd], ["Максимальная просадка", v.maxDrawdownUsd], ["Остаток денежных средств", v.endingCashUsd]]) sourceFact(metrics, label, btMoney(value));
+      target.append(metrics, node("p", "helper-text", `Закрытые сделки: ${btValue(v.closedTrades)} · Списания: ${btValue(v.writeDowns)} · Отклонённые сигналы: ${btValue(v.rejectedSignals)} · Позиции без цены: ${btValue(v.unpricedPositions)}. Списание не означает исполненную продажу.`));
+      target.append(btJson("Причины пропуска сигналов", v.skipped));
+      if (Array.isArray(v.equity)) {
+        const points = v.equity.filter((x) => typeof x.equityUsd === "string" && Number.isFinite(Number(x.equityUsd)) && Number.isFinite(new Date(x.at).getTime()));
+        if (points.length > 1 && points.length === v.equity.length) {
+          const values = points.map((x) => Number(x.equityUsd)); const min = Math.min(...values), max = Math.max(...values); const start = new Date(points[0].at).getTime(), end = new Date(points.at(-1).at).getTime();
+          if (end > start) { const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 800 160"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Equity по модели. Точные значения в таблице ниже."); svg.classList.add("bt-equity"); const line = document.createElementNS(svg.namespaceURI, "polyline"); line.setAttribute("points", points.map((x) => `${10 + 780 * (new Date(x.at).getTime() - start) / (end - start)},${max === min ? 80 : 150 - 140 * (Number(x.equityUsd) - min) / (max - min)}`).join(" ")); svg.append(line); target.append(node("h3", "bt-equity-title", "Equity по модели · USD"), svg); }
+        }
+        target.append(btTable("Equity · точные значения", ["Время UTC", "Equity USD"], v.equity.map((x) => [btUtc(x.at), x.equityUsd])));
+      }
+      if (Array.isArray(v.trades)) target.append(btTable("Журнал расчётных сделок", ["Токен / контракт", "Сигнал UTC", "Вход UTC", "Решение выхода UTC", "Выход UTC", "Время учёта UTC", "Цена входа USD", "Цена выхода USD", "Размер USD", "Расход входа USD", "Получено USD", "Realized PnL USD", "Списание USD", "Издержки USD", "Статус / причина"], v.trades.map((x) => [x.address || x.tokenId, btUtc(x.signalAt), btUtc(x.entryAt), btUtc(x.exitDecisionAt), btUtc(x.exitAt), btUtc(x.accountedAt), x.entryPriceUsd, x.exitPriceUsd, x.sizeUsd, x.entryCostUsd, x.proceedsUsd, x.realizedPnlUsd, x.writeDownUsd, x.costsUsd, `${btValue(x.status)} / ${btValue(x.reason)}`])));
+      if (Array.isArray(v.trades)) {
+        const sales = v.trades.flatMap((trade) => Array.isArray(trade.sales) ? trade.sales.map((sale) => [trade.address || trade.tokenId, btUtc(sale.at), sale.priceUsd, sale.fraction, sale.proceedsUsd, sale.costsUsd]) : []);
+        target.append(btTable("Продажи частями · доля исходной позиции", ["Токен / контракт", "Время UTC", "Цена USD", "Доля", "Получено USD", "Расходы USD"], sales));
+        target.append(node("p", "helper-text", `Журнал содержит ${v.trades.length} из ${btValue(v.tradeCount)} расчётных позиций.`));
+      }
+      if (v.tradesTruncated) target.append(node("p", "analysis-gate", "Журнал сделок усечён источником. Таблица не содержит все операции."));
+    } else target.append(node("p", "analysis-gate", "Числовой результат отсутствует. PnL и просадка неизвестны, а не равны нулю."));
+    target.append(btJson("Неизвестные данные и ограничения", r.unknowns), btJson("Идентификаторы, версии и происхождение", { reportId: r.reportId, datasetId: r.datasetId, source: r.source, schemaVersion: r.schemaVersion, generatedAt: r.generatedAt, computationStatus: r.computationStatus, evidenceStatus: r.status, mode: r.mode, window: r.window, preset: r.preset, params: run.params, executionAuthorized: r.executionAuthorized }));
+  }
+  async function btSelectRun(id, polling = false) {
+    if (!state.session?.authenticated || !runIdValid(id)) { if (id) notice("bt-message", "Некорректный идентификатор запуска.", true); return; }
+    btStopPolling(); const epoch = bt.epoch; const selection = polling ? bt.selection : ++bt.selection;
+    if (!polling) bt.pollUntil = Date.now() + 120000;
+    try {
+      const data = await api(`/backtests/${encodeURIComponent(id)}`); if (epoch !== bt.epoch || selection !== bt.selection) return;
+      if (data.run?.id !== id) throw new Error("Сервер вернул другой запуск."); bt.selected = data.run; bt.runs = bt.runs.map((run) => run.id === id ? { ...run, status: data.run.status, finishedAt: data.run.finishedAt } : run);
+      const u = new URL(location.href); u.searchParams.set("run", id); history.replaceState(null, "", u.pathname + u.search + u.hash);
+      btRenderRuns(); btRenderReport();
+      if (data.run.status === "running" && location.hash === "#research") {
+        if (Date.now() < bt.pollUntil) bt.timer = setTimeout(() => btSelectRun(id, true), 3000);
+        else notice("bt-message", "Автоматическая проверка статуса остановлена через 2 минуты. Расчёт на сервере может продолжаться. Обновите отчёт вручную.");
+      }
+    } catch (error) { if (epoch === bt.epoch && selection === bt.selection) notice("bt-message", errorMessage(error), true); }
+  }
+  function btEnter() {
+    if (!state.session?.authenticated || bt.started) return; bt.started = true; btSync(); btLoadRuns(); const id = new URLSearchParams(location.search).get("run"); if (id) btSelectRun(id);
+  }
+  $("bt-coverage-refresh").addEventListener("click", btLoadCoverage);
+  $("bt-runs-refresh").addEventListener("click", btLoadRuns);
+  $("bt-preset").addEventListener("change", () => { bt.coverage = null; bt.pending = null; $("bt-coverage").replaceChildren(node("p", "helper-text", "Пресет изменён. Проверьте покрытие и параметры заново.")); btSync(); });
+  $("bt-mode").addEventListener("change", btSync);
+  document.querySelectorAll('input[name="bt-window"]').forEach((input) => input.addEventListener("change", btSync));
+  $("bt-form").addEventListener("submit", async (event) => {
+    event.preventDefault(); btSync(); if ($("bt-submit").disabled) return;
+    const params = { mode: $("bt-mode").value, window: btWindow(), preset: Number($("bt-preset").value), end: Date.parse(bt.coverage.period.end) };
+    const key = JSON.stringify(params); if (!bt.pending || bt.pending.key !== key) bt.pending = { key, body: { ...params, idempotencyKey: crypto.randomUUID() } };
+    const epoch = bt.epoch; bt.busy = true; btSync(); notice("bt-message", "Сохраняем запрос расчёта…");
+    try { const data = await api("/backtests", { method: "POST", body: bt.pending.body }); if (epoch !== bt.epoch) return; if (!runIdValid(data.run?.id)) throw new Error("Не получен идентификатор запуска. Обновите историю."); bt.pending = null; notice("bt-message", "Запуск сохранён. Итоговая достаточность данных отражается отдельно в отчёте."); await btLoadRuns(); await btSelectRun(data.run.id); }
+    catch (error) { if (epoch === bt.epoch) notice("bt-message", `${errorMessage(error)} Обновите список. Повтор неизменённого запроса использует тот же ключ и не должен создавать дубликат.`, true); }
+    finally { if (epoch === bt.epoch) { bt.busy = false; btSync(); } }
+  });
 
   window.addEventListener("hashchange", selectTab);
   selectTab();

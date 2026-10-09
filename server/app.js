@@ -5,6 +5,8 @@ import { constantEqual, resolveIdentity } from './auth.js';
 import { addressOf, makeChallenge, signatureMatches, isExternallyOwned } from './wallets.js';
 import { networkStatus } from './network.js';
 import { createAnalysisClient } from './analyses.js';
+import { createBacktestClient, backtestParams } from './backtests.js';
+import { createBacktestStore } from './backtest-store.js';
 
 const WEB = fileURLToPath(new URL('../web/', import.meta.url));
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -29,7 +31,9 @@ async function readBody(req) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw error(400, 'invalid_json', 'Некорректный JSON.'); }
 }
 
-export function createApp({ store, origin = 'https://aistat.app', identity = resolveIdentity, verifyEOA = isExternallyOwned, network = networkStatus(), analyses = createAnalysisClient(), release = 'development' }) {
+export function createApp({ store, origin = 'https://aistat.app', identity = resolveIdentity, verifyEOA = isExternallyOwned, network = networkStatus(), analyses = createAnalysisClient(), backtests = createBacktestClient(), release = 'development' }) {
+  const runs = createBacktestStore(store.db);
+  const pendingRuns = new Set();
   const url = new URL(origin);
   if (url.origin !== origin || (url.protocol !== 'https:' && !['127.0.0.1', 'localhost'].includes(url.hostname))) throw new Error('Invalid public origin');
   const server = createServer(async (req, res) => {
@@ -67,13 +71,47 @@ export function createApp({ store, origin = 'https://aistat.app', identity = res
       }
       if (req.method === 'GET' && path === '/bot/api/session') {
         json(200, { authenticated: true, user: { id: actor.id, name: actor.name }, csrfToken: actor.csrf,
-          capabilities: { walletLinking: true, taskCreation: true, settings: true, liveTrading: false, paperTrading: false, aiWorker: false } }); return;
+          capabilities: { historicalBacktest: true, walletLinking: true, taskCreation: true, settings: true, liveTrading: false, paperTrading: false, aiWorker: false } }); return;
       }
       let body;
       if (!['GET', 'HEAD'].includes(req.method)) {
         if (req.headers.origin !== origin || !constantEqual(req.headers['x-csrf-token'], actor.csrf)) throw error(403, 'csrf_rejected', 'Обновите страницу и повторите действие.');
         if (!store.allowRate(`mutate:${actor.id}`, 60)) throw error(429, 'rate_limit', 'Слишком много запросов. Повторите через минуту.');
         if (req.method !== 'DELETE') body = await readBody(req);
+      }
+      if (req.method === 'GET' && path === '/bot/api/backtests/coverage') {
+        if ([...requestUrl.searchParams.keys()].some(key => key !== 'preset') || requestUrl.searchParams.getAll('preset').length > 1) throw error(400, 'invalid_query', 'Неизвестные параметры покрытия.');
+        const preset = requestUrl.searchParams.has('preset') ? Number(requestUrl.searchParams.get('preset')) : account.preset;
+        if (![150, 1000, 5000].includes(preset)) throw error(400, 'invalid_preset', 'Выберите допустимый бюджет.');
+        if (!store.allowRate(`backtest-coverage:${actor.id}`, 6)) throw error(429, 'rate_limit', 'Повторите проверку через минуту.');
+        json(200, await backtests({ mode: 'coverage', window: '14d', preset, end: Math.floor(Date.now() / 60000) * 60000 })); return;
+      }
+      if (req.method === 'GET' && path === '/bot/api/backtests') { json(200, { runs: runs.list(actor.id) }); return; }
+      if (req.method === 'POST' && path === '/bot/api/backtests') {
+        fields(body, ['mode', 'window', 'preset', 'end', 'idempotencyKey']);
+        const params = backtestParams(body);
+        if (typeof body.idempotencyKey !== 'string' || !uuid.test(body.idempotencyKey)) throw error(400, 'invalid_input', 'Нужен уникальный ключ запроса.');
+        if (!store.allowRate(`backtest-run:${actor.id}`, 4)) throw error(429, 'rate_limit', 'Повторите запуск через минуту.');
+        const reservation = runs.reserve(actor.id, body.idempotencyKey, params);
+        if (reservation.created) {
+          const operation = Promise.resolve().then(() => backtests(params)).then(
+            report => runs.finish(actor.id, reservation.run.id, report),
+            () => runs.finish(actor.id, reservation.run.id, null, 'source_unavailable')
+          ).catch(() => { /* Shutdown or bounded storage failure: restart marks unfinished records interrupted. */ });
+          pendingRuns.add(operation); operation.finally(() => pendingRuns.delete(operation));
+        }
+        json(reservation.created ? 202 : 200, { run: reservation.run }); return;
+      }
+      const runMatch = path.match(/^\/bot\/api\/backtests\/([0-9a-f-]+)$/);
+      if (runMatch && ['GET', 'DELETE'].includes(req.method)) {
+        if (!uuid.test(runMatch[1])) throw error(404, 'not_found', 'Прогон не найден.');
+        if (req.method === 'DELETE') {
+          if (!runs.remove(actor.id, runMatch[1])) throw error(404, 'not_found', 'Прогон не найден или ещё выполняется.');
+          json(200, { deleted: true }); return;
+        }
+        const run = runs.get(actor.id, runMatch[1]);
+        if (!run) throw error(404, 'not_found', 'Прогон не найден.');
+        json(200, { run }); return;
       }
       if (req.method === 'GET' && path === '/bot/api/overview') {
         json(200, { mode: 'RESEARCH', chainId: 4663, protocols: ['Pons V1', 'Pons V2'], preset: account.preset,
@@ -136,6 +174,7 @@ export function createApp({ store, origin = 'https://aistat.app', identity = res
       else res.end();
     }
   });
+  server.backtestsIdle = () => Promise.all([...pendingRuns]);
   server.requestTimeout = 15000; server.headersTimeout = 10000;
   return server;
 }

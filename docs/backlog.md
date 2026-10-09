@@ -41,3 +41,9 @@
 Кандидат реализации development worker — отдельный server job с [Codex SDK](https://learn.chatgpt.com/docs/codex-sdk) или [non-interactive exec](https://learn.chatgpt.com/docs/non-interactive-mode), изолированным workspace, структурированным результатом и ограниченными инструментами. Astra сохраняется как выбранный пользовательский руководитель разработки; доступность серверного runtime, модель и способ оплаты ещё проверяются. Ключ провайдера выдаётся изолированному agent invocation/proxy, не среде repository build/test. Текущий чат не является постоянно работающим сервером. Расходы DevAI учитываются отдельно от trading equity; запрос не экономить токены разработки не равен бессрочному operational budget.
 
 Определение DONE: acceptance выполнены, необходимые checks успешны, артефакт существует в нужной среде, R-статусы/журнал обновлены, ограничения указаны. Commit не означает deployment; deployment не означает разрешение live; profitable backtest не означает live readiness.
+
+## Ограниченное исследование параметров
+
+| ID / приоритет | Работа | Статус / зависимости | Evidence выхода |
+|---|---|---|---|
+| B-024 / P1 | Конечный preregistered перебор ACS и аккаунтный отчёт. R-026 | IN_PROGRESS / B-023 | Frozen envelope до расчётов, независимый evaluator review, все 48 trials, baseline regression, причинность/ledger/isolation tests, UI и observed deployment. Не завершает B-009, B-014–019. |

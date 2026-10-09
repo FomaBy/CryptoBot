@@ -164,3 +164,7 @@ Browser integration QA с настоящими producer/consumer/API и синт
 R-025/B-023 завершены для текущей функции исследования и сохранённых отчётов; полный B-009/OOS, paper/live и AI workers остаются отдельной невыполненной работой. CI code `c393098` прошёл; финальная документация добавляет это observed evidence.
 
 Независимый audit координатора через Python Decimal дополнительно подтвердил для всех presets: сумму trade realized и costs против report totals, сумму partial proceeds против trade proceeds и closed proceeds−entryCost против realized PnL. У всех трижды проверенных сценариев 2 trades, без truncation, профиль ENTRY65_DEX и `fullWindow=false`.
+
+## E-021 — 2026-10-09: preregistration оптимизации (R-026, B-024)
+
+Пользователь запросил улучшение прибыльности. До новых фактических прогонов зафиксированы [envelope](research/optimization-envelope-v1.json) и [методология](research/optimization-study.md): 48 оценок на прежнем cutoff 17:21 UTC, вся история exploratory. Проведён read-only разбор исходных расходов и задержек; параметры тарифа не изменены. Реальные trials ещё не запускались; baseline/evaluator review и deployment остаются впереди. Полные B-009/R-015 не объявляются выполненными.

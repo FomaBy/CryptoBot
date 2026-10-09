@@ -141,19 +141,32 @@ trap rollback ERR
 python3 "$BASE/apply.py" "$BASE" apply
 /usr/sbin/cloudlinux-selector restart --json --interpreter=nodejs --app-root=acs/app
 /usr/sbin/cloudlinux-selector restart --json --interpreter=nodejs --app-root=cryptobot/app
-sleep 3
-curl --fail --silent --show-error --max-time 35 'https://aistat.app/crypto/api/analysis/v1?chainId=4663' > "$BACKUP/analysis-smoke.json"
-curl --fail --silent --show-error --max-time 35 https://aistat.app/bot/api/health > "$BACKUP/bot-health.json"
-python3 - "$BASE" <<'PY'
-import json,sys
+python3 - "$BASE" <<'PYREADY'
+import json,sys,time,urllib.request
 from pathlib import Path
 p=Path(sys.argv[1]);m=json.loads((p/'stage/manifest.json').read_text())
-a=json.loads((p/'backup/analysis-smoke.json').read_text());b=json.loads((p/'backup/bot-health.json').read_text())
-assert a.get('schemaVersion')=='acs.analysis.v1' and a.get('chainId')==4663 and a.get('executionAuthorized') is False
-assert a.get('source',{}).get('revision')==m['revisions']['acs']
-assert b.get('release')==m['release'] and b.get('liveEnabled') is False and b.get('paperEnabled') is False
-print('Verified shared schema/source revision and bot release; execution disabled')
-PY
+deadline=time.monotonic()+90
+while True:
+ try:
+  def get(url,name):
+   request=urllib.request.Request(url,headers={'Cache-Control':'no-cache'})
+   with urllib.request.urlopen(request,timeout=min(10,max(1,deadline-time.monotonic()))) as response:
+    raw=response.read(4*1024*1024)
+   (p/'backup'/name).write_bytes(raw)
+   return json.loads(raw)
+  a=get('https://aistat.app/crypto/api/analysis/v1?chainId=4663','analysis-smoke.json')
+  b=get('https://aistat.app/bot/api/health','bot-health.json')
+  ready=(a.get('schemaVersion')=='acs.analysis.v1' and a.get('chainId')==4663 and a.get('executionAuthorized') is False
+   and a.get('source',{}).get('revision')==m['revisions']['acs']
+   and b.get('release')==m['release'] and b.get('liveEnabled') is False and b.get('paperEnabled') is False)
+  if ready:
+   print('Verified shared schema/source revision and bot release; execution disabled')
+   break
+ except Exception:
+  pass
+ if time.monotonic()>=deadline: raise SystemExit('Readiness deadline exceeded; exact source/release not observed')
+ time.sleep(min(3,max(0,deadline-time.monotonic())))
+PYREADY
 trap - ERR
 echo 'Integration activated __RELEASE__'
 '''.replace('__JOB__', job).replace('__SHA__', sha).replace('__RELEASE__', release)

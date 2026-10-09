@@ -90,7 +90,7 @@ Search envelope фиксирует разрешённые признаки/оп�
 
 | ID | Требование, источник, статус | Критерий приёмки |
 |---|---|---|
-| R-026 | Исследовать улучшение текущих ACS правил. Запрос пользователя 9 октября 2026. IN_PROGRESS | До испытаний опубликован finite envelope: 8 вариантов × 3 бюджета × base/stress = 48 trials, неизменные costs/guards/caps. Общий frozen dataset; все результаты, включая failed/zero/truncated, сохраняются в аккаунтном отчёте. Видны champion/no-trade, net/costs/drawdown, фактические задержки и одинаковые fill paths. Вся история exploratory; выбор не включает promotion/live, будущий OOS и paper обязательны. |
+| R-026 | Исследовать улучшение текущих ACS правил. Запрос пользователя 9 октября 2026. DONE — finite research feature, E-022 | До испытаний опубликован finite envelope: 8 вариантов × 3 бюджета × base/stress = 48 trials, неизменные costs/guards/caps. Общий frozen dataset; все результаты, включая failed/zero/truncated, сохраняются в аккаунтном отчёте. Видны champion/no-trade, net/costs/drawdown, фактические задержки и одинаковые fill paths. Вся история exploratory; выбор не включает promotion/live, будущий OOS и paper обязательны. |
 
 ## Открытые решения
 

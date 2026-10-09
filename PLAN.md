@@ -20,7 +20,7 @@
 
 В `server/{auth,store,wallets,app,index}.js` готовы root-session adapter, account-scoped SQLite, EOA ownership challenge/verify/unlink, приватные задачи, USD preset и базовый audit. Защищённые API проверяют сессию, изменяющие запросы — Origin/CSRF; owner/status injection отклоняются. Первый web release опубликован, исходные 16 тестов и UI/public production QA пройдены; текущие проверки расширены для общей аналитики. Статусы R-005/R-006/R-018 остаются PARTIAL до полной приёмки.
 
-Опубликованы shared ACS analysis и исторические сценарии с сохранением аккаунтных отчётов (E-017–020). Последние проверки исторического инкремента: 25 тестов bot, production health/assets/auth denial и фактические расчёты. Анализ 214 кандидатов, полноценный causal execution replay, paper trading, development worker и signer ещё не реализованы. Ограниченное исследование 48 вариантов R-026/B-024 начато по заранее зафиксированному envelope; это не работающий автономный optimizer и не доказательство edge. Подробности и ограничения — [execution log](docs/execution-log.md).
+Опубликованы shared ACS analysis и исторические сценарии с сохранением аккаунтных отчётов (E-017–020). Последние проверки исторического инкремента: 25 тестов bot, production health/assets/auth denial и фактические расчёты. Анализ 214 кандидатов, полноценный causal execution replay, paper trading, development worker и signer ещё не реализованы. Ограниченное исследование 48 вариантов R-026/B-024 опубликовано и выполнено по заранее зафиксированному envelope: положительные base ячейки не прошли stress/сэмпл gate, выбран no-trade; это не работающий автономный optimizer и не доказательство edge. Подробности и ограничения — [execution log](docs/execution-log.md).
 
 ## Что бот должен доказать
 

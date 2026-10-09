@@ -18,4 +18,6 @@
 
 Материалы: [требования и приёмка](REQUIREMENTS.md), [план](PLAN.md), [backlog](docs/backlog.md), [журнал исполнения](docs/execution-log.md), [host/auth inventory](docs/host-inventory.md), [разбор ТЗ](docs/research/spec-review.md), [методика проверки edge](docs/research/wallet-edge-validation.md), [skills](docs/skills-inventory.md). Пять project-local skills установлены в `.agents/skills`; их происхождение и хэши фиксирует `skills.lock.json`. Проверки: `python3 scripts/verify_workspace.py`, `npm test` на Node 24. Локальные credentials исключены из Git; signing keys не попадают в браузер или LLM.
 
-[Ограниченное сравнение ACS](docs/research/optimization-study.md), R-026/B-024: 8 заранее фиксированных вариантов, 3 бюджета и base/stress дают 48 сохраняемых результатов. Исследование не уменьшает расходы, не включает live/paper и не продвигает выбранную гипотезу. Весь исходный архив уже просмотрен; следующие проверки требуют новых данных.
+[Ограниченное сравнение ACS](docs/research/optimization-study.md), R-026/B-024, опубликовано E-022: 8 заранее фиксированных вариантов, 3 бюджета и base/stress дают 48 сохраняемых результатов. Исследование не уменьшает расходы, не включает live/paper и не продвигает выбранную гипотезу. Весь исходный архив уже просмотрен; следующие проверки требуют новых данных.
+
+Фактический finite study сохранил все 48 результатов: отдельные base варианты положительны, но недостаточно устойчивы к задержкам/стрессу. Решение — no promotion; текущие hard caps и live/paper permissions не изменены.

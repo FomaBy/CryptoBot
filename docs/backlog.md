@@ -46,4 +46,4 @@
 
 | ID / приоритет | Работа | Статус / зависимости | Evidence выхода |
 |---|---|---|---|
-| B-024 / P1 | Конечный preregistered перебор ACS и аккаунтный отчёт. R-026 | IN_PROGRESS / B-023 | Frozen envelope до расчётов, независимый evaluator review, все 48 trials, baseline regression, причинность/ledger/isolation tests, UI и observed deployment. Не завершает B-009, B-014–019. |
+| B-024 / P1 | Конечный preregistered перебор ACS и аккаунтный отчёт. R-026 | DONE / B-023; E-022 | Frozen envelope до расчётов, независимый evaluator review, все 48 trials, baseline regression, причинность/ledger/isolation tests, UI и observed deployment. Не завершает B-009, B-014–019. |

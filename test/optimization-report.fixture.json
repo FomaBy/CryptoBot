@@ -1,0 +1,3023 @@
+{
+  "schemaVersion": "acs.optimization.v1",
+  "source": {
+    "id": "ai-crypto-statistics",
+    "revision": null
+  },
+  "chainId": 4663,
+  "preregistration": {
+    "studyId": "acs-entry65-exploratory-20261009-v1",
+    "commit": "0217aa53190b21fc5ef5ed97a2a9c42be9e9183e",
+    "manifestHash": "e1a9c4b0ef051e676188fc646ff4e9fb9ae63b8242391352aa0a2c5b81e4d1bd",
+    "registeredAt": "2026-10-09T17:55:00.000Z"
+  },
+  "manifest": {
+    "schemaVersion": "cryptobot.optimization.envelope.v1",
+    "studyId": "acs-entry65-exploratory-20261009-v1",
+    "registeredAt": "2026-10-09T17:55:00.000Z",
+    "chainId": 4663,
+    "scope": "Pons V1/V2 historical observations only",
+    "requestedFrom": "2026-09-25T17:21:00.000Z",
+    "end": "2026-10-09T17:21:00.000Z",
+    "expectedBaselineDatasetId": "abee8f6b9c4d6e27732d59cb17a2c44b8a9f3d51f6a915104bbda44005906d15",
+    "sourceBaselineRevision": "9204180b4497c355bde2e7fdf441d081e0a2b255",
+    "dataStatus": "already_inspected_exploratory_not_holdout",
+    "grid": {
+      "ratings": [
+        65,
+        75
+      ],
+      "exits": [
+        "C",
+        "FIXED"
+      ],
+      "entryDelaysSec": [
+        5,
+        15
+      ],
+      "presets": [
+        150,
+        1000,
+        5000
+      ],
+      "scenarios": [
+        "base",
+        "stress"
+      ],
+      "candidateCount": 8,
+      "trialCount": 48
+    },
+    "champion": {
+      "rating": 65,
+      "exit": "C",
+      "entryDelaySec": 5
+    },
+    "exitDefinitions": {
+      "C": "Existing ENTRY65_DEX C plan: stop40% before first sale, time30m,75% original at1.5x, remainder2x/trail20%/15m after first sale",
+      "FIXED": "Existing E65_PLAN: full-position stop40%, time60m, take-profit2x"
+    },
+    "costsUnchanged": {
+      "feeBpsPerSide": 100,
+      "taxBpsPerSide": 1000,
+      "slippageBpsPerSide": 100,
+      "gasUsdPerTransaction": "0.03",
+      "historicalActualFeesVerified": false
+    },
+    "stress": {
+      "liquidityMultiplier": 0.5,
+      "slippageMultiplier": 2,
+      "additionalEntryDelaySec": 10,
+      "additionalExitDelaySec": 10
+    },
+    "invariants": [
+      "same frozen dataset for all trials",
+      "historical first-observed causal signals",
+      "unchanged safety guards and risk caps",
+      "one first edge per token",
+      "fixed-point USD ledger",
+      "all failed zero and truncated trials retained",
+      "no paid providers or new market calls",
+      "baseline exact regression before actual trials",
+      "independent evaluator review before actual trials"
+    ],
+    "selection": {
+      "eligibility": "All six preset/scenario results complete, nonfailed, and at least one closed position each",
+      "rank": [
+        "minimum netPnl/initial across all six descending",
+        "maximum drawdown/initial across all six ascending",
+        "candidateId ascending"
+      ],
+      "selectOnlyIf": "minimum netPnl strictly positive and zero unpriced positions in all six results",
+      "otherwise": "no_trade_preferred",
+      "promotionAuthorized": false
+    },
+    "diagnostics": [
+      "net realized write-down and modeled costs",
+      "accounting price contribution = net + costs, not frictionless rerun",
+      "actual entry and final exit delays",
+      "holding times",
+      "identical fill-path behavior hashes",
+      "no-trade PnL zero"
+    ],
+    "futureOos": {
+      "status": "not_started",
+      "embargoSec": 4500,
+      "eligibleAfterRule": "actual selection time plus embargo",
+      "alreadyViewedDataExcluded": true,
+      "paperRequiredBeforePromotion": true
+    },
+    "limits": {
+      "candidateTokens": 500,
+      "selectedRows": 250000,
+      "evaluations": 48,
+      "concurrentWorkers": 1,
+      "paidProviderCalls": 0
+    },
+    "executionAuthorized": false
+  },
+  "assumptions": {
+    "costs": {
+      "feePct": "1",
+      "taxPct": "10",
+      "slippagePct": "1",
+      "gasUsd": "0.03",
+      "impactModel": "qliq_proxy",
+      "actualHistoricalFeesVerified": false
+    },
+    "risk": {
+      "maxOpen": 3,
+      "maxExposurePct": "20",
+      "dailyLossPct": "20",
+      "maxTradesPerDay": 100,
+      "exitGasReserveUsd": "0.06",
+      "oneEntryPerToken": true
+    },
+    "stress": {
+      "liquidityMultiplier": 0.5,
+      "slippageMultiplier": 2,
+      "additionalEntryDelaySec": 10,
+      "additionalExitDelaySec": 10
+    },
+    "exits": {
+      "C": {
+        "kind": "C",
+        "stopPct": 40,
+        "timeMin": 30,
+        "take1X": 1.5,
+        "take1Frac": 0.75,
+        "take2X": 2,
+        "trailPct": 20,
+        "runnerMaxMin": 15
+      },
+      "FIXED": {
+        "kind": "FIXED",
+        "tpX": 2,
+        "stopPct": 40,
+        "timeMin": 60
+      }
+    },
+    "unsupportedGates": [
+      "migration_window",
+      "route_state",
+      "never_rules",
+      "lpPull",
+      "scam",
+      "vetoAfter",
+      "devDump",
+      "knife",
+      "ban"
+    ],
+    "guards": {
+      "ratingVersions": [
+        2
+      ],
+      "canEnterRequired": true,
+      "stage": "graduated",
+      "maxMarketCapUsd": "100000",
+      "rejectUnknown": "deny",
+      "maxGapSec": 600,
+      "exitDelaySec": 5,
+      "entrySizesUsd": {
+        "150": "10",
+        "1000": "50",
+        "5000": "250"
+      }
+    }
+  },
+  "period": {
+    "requestedFrom": "2026-09-25T17:21:00.000Z",
+    "from": "2026-10-09T16:40:00.000Z",
+    "end": "2026-10-09T17:21:00.000Z"
+  },
+  "datasetId": "abee8f6b9c4d6e27732d59cb17a2c44b8a9f3d51f6a915104bbda44005906d15",
+  "evaluatorHash": "74994218cc539d214afc7316a70a93156f84c26d4b608a3f942de3cc895fc738",
+  "sourceProfileHashes": {
+    "C": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+    "FIXED": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add"
+  },
+  "computationStatus": "complete",
+  "evidenceStatus": "insufficient_evidence",
+  "coverage": {
+    "rows": 8,
+    "selectedRows": 8,
+    "totalRows": 8,
+    "tokens": 1,
+    "totalTokens": 1,
+    "excludedTokens": 0,
+    "firstAt": "2026-10-09T16:40:00.000Z",
+    "lastAt": "2026-10-09T16:41:00.000Z",
+    "daily": [],
+    "rated": 8,
+    "priced": 8,
+    "liquid": 8,
+    "truncated": false,
+    "fullWindow": false,
+    "maxGapSec": 10,
+    "missingDays": [],
+    "reasons": [
+      "profile_gates_unavailable",
+      "window_incomplete"
+    ],
+    "selection": "historical_entry_candidates_before_outcomes",
+    "metricsBasis": "selected_pons_observations",
+    "maxRows": 250000,
+    "maxTokens": 500
+  },
+  "grid": {
+    "ratings": [
+      65,
+      75
+    ],
+    "exits": [
+      "C",
+      "FIXED"
+    ],
+    "entryDelaysSec": [
+      5,
+      15
+    ],
+    "presets": [
+      150,
+      1000,
+      5000
+    ],
+    "scenarios": [
+      "base",
+      "stress"
+    ],
+    "candidateCount": 8,
+    "trialCount": 48
+  },
+  "trials": [
+    {
+      "trialId": "bebaccfe425834bfed4c72fef2e5d45497f10f971f4480d084e9c88edf9ab07b",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "366e50b2b1da6eea28443122048755cbbbf95199e4c18baf6f598902351dc15e",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "0236c055f419e2a5f12bae907b47ee0bef67771496e68fa031a8b9d3e262a4b8",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.13743247",
+        "totalCostsUsd": "3.53289721",
+        "conservativeNetPnlUsd": "6.13743247",
+        "realizedPnlUsd": "6.13743247",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "ac4a6b2cfb7648fb8be21e3d538ccc2f2b5c2f885cf9a09fcdf1c37e6ed4cfe1",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "b932bb529ff7bfb0d5e7157b245740c7e65f36a3671b2611f82586c5fa13fafc",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "e3bf138e2b4e8afb6bd252467984b7000ae63d160cf40103802d6cb1b46d8738",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.23286694",
+        "totalCostsUsd": "3.58150433",
+        "conservativeNetPnlUsd": "4.23286694",
+        "realizedPnlUsd": "4.23286694",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437127"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "9481c2902f9e6c1550f8eaabd03715a6826b1e991db87941285531f2199f0b22",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "366e50b2b1da6eea28443122048755cbbbf95199e4c18baf6f598902351dc15e",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "14a1670c322d32359342782c03e67e0087941708ca6c5e1a93674f1cdb71ecc9",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.35551877",
+        "totalCostsUsd": "17.80368523",
+        "conservativeNetPnlUsd": "30.35551877",
+        "realizedPnlUsd": "30.35551877",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.159204"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "3a044d3b60ca60f811d801f1502668a4fedbcfbe237da8c3884ba509308185ed",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "b932bb529ff7bfb0d5e7157b245740c7e65f36a3671b2611f82586c5fa13fafc",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "4cbc0579e8ca948777a554f27354ae240b1babeaabdadb6d94ed633e9957e293",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1020.38357242",
+        "totalCostsUsd": "18.37880383",
+        "conservativeNetPnlUsd": "20.38357242",
+        "realizedPnlUsd": "20.38357242",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237625"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "3d903326cfe56e9704eed6772aeb2476d95697e56b9b3f3d3c85f361f0c9d626",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "366e50b2b1da6eea28443122048755cbbbf95199e4c18baf6f598902351dc15e",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "19d5a8e70777963adab84ddae0d4d20bb4943555d07164a7b86d0140849fb46d",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5135.72144225",
+        "totalCostsUsd": "100.37611873",
+        "conservativeNetPnlUsd": "135.72144225",
+        "realizedPnlUsd": "135.72144225",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "b9922cefe401da7ef1a4d72712c486c9c28cb433bfebd69ad39baa751cb16f91",
+      "candidateId": "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "parameterHash": "b932bb529ff7bfb0d5e7157b245740c7e65f36a3671b2611f82586c5fa13fafc",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "db66922be68078cb7ef651b415030dd49130e39a259ec125cb73ff50ec7f3ad9",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5076.34957275",
+        "totalCostsUsd": "110.07899869",
+        "conservativeNetPnlUsd": "76.34957275",
+        "realizedPnlUsd": "76.34957275",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "357646dceb64247fd3b16eadf9800d244f5f945de51fbfe351f03eb96e360a80",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "7807b5edd6e9f5a52313472d2cc63a2742231f0abccce4f69c21fc704666f664",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "b37d9af4f70a316fdfdeb0802deb11387a613e5c1e8395fcfb5668fdb80d067d",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.13743247",
+        "totalCostsUsd": "3.53289721",
+        "conservativeNetPnlUsd": "6.13743247",
+        "realizedPnlUsd": "6.13743247",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "a9dc942bbad088919164164d9a5913efa8b16bad207365c33c7375525c59b279",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "667b9c6a8946b78a48fdf7dd9de2ecdee98dda937c196e4782318ced5bcbfa71",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "01452e94047c7f6d9b5ae09a192030ae44dbf65dac1bcdd138826c365edbab9d",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.23286694",
+        "totalCostsUsd": "3.58150433",
+        "conservativeNetPnlUsd": "4.23286694",
+        "realizedPnlUsd": "4.23286694",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437127"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "a2a61ce88cb7ae49afa577a4da6ef24ffb96186ac4c0cd160e5241e6241123d8",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "7807b5edd6e9f5a52313472d2cc63a2742231f0abccce4f69c21fc704666f664",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "212557667e2d994d2c04793f62b1c610638cd8a248acd2d7d57dcfb7db0b3656",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.35551877",
+        "totalCostsUsd": "17.80368523",
+        "conservativeNetPnlUsd": "30.35551877",
+        "realizedPnlUsd": "30.35551877",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.159204"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "107fbb49b3f5423a76e77606ee45dca1f2dc9aa322c1a26e0df58712c28f51c9",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "667b9c6a8946b78a48fdf7dd9de2ecdee98dda937c196e4782318ced5bcbfa71",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "6f37fdcb1964fb723c30bcbb8b7a52b59444cb91f335124927350b3fc457401b",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1020.38357242",
+        "totalCostsUsd": "18.37880383",
+        "conservativeNetPnlUsd": "20.38357242",
+        "realizedPnlUsd": "20.38357242",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237625"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "d92338bdc2c78a572e243a47e14dd5062b720580822231629210b4772fd8f127",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "7807b5edd6e9f5a52313472d2cc63a2742231f0abccce4f69c21fc704666f664",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "8e593d1aa01abbca7d5ec6101814cf51fdafe798c43678d370f3e81085b7abe1",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5135.72144225",
+        "totalCostsUsd": "100.37611873",
+        "conservativeNetPnlUsd": "135.72144225",
+        "realizedPnlUsd": "135.72144225",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "a13ef6675fd14cc204b72572fffa2ce051f5396338d65aed5fa096101e4b87fd",
+      "candidateId": "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "parameterHash": "667b9c6a8946b78a48fdf7dd9de2ecdee98dda937c196e4782318ced5bcbfa71",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "511cf59953357e0497af3cc40eff4b8a4f841a60f4ea1fa23a759afa2d396970",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5076.34957275",
+        "totalCostsUsd": "110.07899869",
+        "conservativeNetPnlUsd": "76.34957275",
+        "realizedPnlUsd": "76.34957275",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "59daca01408c3eaec34405e1e929790f34c3962db5862858c0b5d051908e8337",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "0c5b54eeaeec2e7612364ecd51fde9ab8159f3f293fa0dc2a27bd6ba9ca0679f",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "b06dac6dc49bba206833f184555434a6e04d1c7f83587eb71bb120803ccd926a",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.15621621",
+        "totalCostsUsd": "3.51411347",
+        "conservativeNetPnlUsd": "6.15621621",
+        "realizedPnlUsd": "6.15621621",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01878374",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "541600fa05780207ef4170fde703eb92146621d98de03211ae61cffc12e9d4a0",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "cc1724984360bc23b84d361646af6b0c1619096f9819724e7c5f29dc94885dba",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "c94d4f7d311569e41c4d74bd351901ab018246a09310fb1b7c42fe4d758af6a4",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.24519662",
+        "totalCostsUsd": "3.56917464",
+        "conservativeNetPnlUsd": "4.24519662",
+        "realizedPnlUsd": "4.24519662",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437126"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01232968",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "34ccaaf3c14b3b12748bb0aee8f9ab4737b1fa2090b55774fd1598ec5a7f057e",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "0c5b54eeaeec2e7612364ecd51fde9ab8159f3f293fa0dc2a27bd6ba9ca0679f",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "f18ceb8817dcdad0b1abac93b1cef7eee0f827048eb17cd149b1465780eb4509",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.11037387",
+        "totalCostsUsd": "18.04883012",
+        "conservativeNetPnlUsd": "30.11037387",
+        "realizedPnlUsd": "30.11037387",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.15920399"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.2451449",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "18f587000dc8ba431271ce943e86da8560d81a140749c807436ba7262bbfb784",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "cc1724984360bc23b84d361646af6b0c1619096f9819724e7c5f29dc94885dba",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "e7a90f8cf6637f00b6f3e5d315e54dfe65dd898898a2555618bcba81b016d94d",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1019.98714913",
+        "totalCostsUsd": "18.77522711",
+        "conservativeNetPnlUsd": "19.98714913",
+        "realizedPnlUsd": "19.98714913",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237624"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.39642329",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "7492066ae264e579027b14a5e6ee403fcab760f55856f10485a54c09c0727e02",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "0c5b54eeaeec2e7612364ecd51fde9ab8159f3f293fa0dc2a27bd6ba9ca0679f",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "f23d1eb7d92523ea841d172eeac73a04157ec0772c38aaea75d61a86492faa0b",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5129.47696788",
+        "totalCostsUsd": "106.6205931",
+        "conservativeNetPnlUsd": "129.47696788",
+        "realizedPnlUsd": "129.47696788",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-6.24447437",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "48071c3de76071c4daea460a86a53ca7ecbe466b491f9e9fdb26cad783c13c01",
+      "candidateId": "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "parameterHash": "cc1724984360bc23b84d361646af6b0c1619096f9819724e7c5f29dc94885dba",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "462f0342eceaed762108961660abf3b1aede97be40ba8aeeb56673378dfb9686",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5067.36153357",
+        "totalCostsUsd": "119.06703787",
+        "conservativeNetPnlUsd": "67.36153357",
+        "realizedPnlUsd": "67.36153357",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-8.98803918",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "9a958825a7329ef150aaf982518bb6721ff9197b19a0a1ed77fa6e1c3f356af3",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "65f1559f9a8da997adbbe5605f90325ef1df77da121614205e8c6c4f7c8a8980",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "490d653678e5701578f1827b4d5b7233b6285b8f689231b2ab72f15916b2f75c",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.15621621",
+        "totalCostsUsd": "3.51411347",
+        "conservativeNetPnlUsd": "6.15621621",
+        "realizedPnlUsd": "6.15621621",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01878374",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "f7ef9d3e7936b3b0799d79b707ce59ed5ac16fa9dcabb0d276b2b058102eab1c",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "457c3a97639a4b3f0734722d4ca7efac6ea548c56a91272b11a5908580d9981d",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "1f82ca014731de614b98076756a4c04d9bb7bde113a70b8972d3ea9a09c4d93d",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.24519662",
+        "totalCostsUsd": "3.56917464",
+        "conservativeNetPnlUsd": "4.24519662",
+        "realizedPnlUsd": "4.24519662",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437126"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01232968",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "31364b06bc354205c7d42d3a96f90cf5753d96216f82f02fc79f79db467b67c3",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "65f1559f9a8da997adbbe5605f90325ef1df77da121614205e8c6c4f7c8a8980",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "9f4c65a46ded1f47c3df65344589fc97f3b3343e4255800d2d903ade0fe1a17b",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.11037387",
+        "totalCostsUsd": "18.04883012",
+        "conservativeNetPnlUsd": "30.11037387",
+        "realizedPnlUsd": "30.11037387",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.15920399"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.2451449",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "d235182efa8e4e260b0a2155128d32e77a9a92e0fde18bd2babb5553f3489f71",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "457c3a97639a4b3f0734722d4ca7efac6ea548c56a91272b11a5908580d9981d",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "40f7c0706a56057c678ae53afb73d529c1cdd8375cebd10cd54439b010c976e5",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1019.98714913",
+        "totalCostsUsd": "18.77522711",
+        "conservativeNetPnlUsd": "19.98714913",
+        "realizedPnlUsd": "19.98714913",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237624"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.39642329",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "916deb64820bcb0185422977f7ec840a3f1816d4c87fb9d354fc05f79d4e2194",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "65f1559f9a8da997adbbe5605f90325ef1df77da121614205e8c6c4f7c8a8980",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "b35fab35e8a48f8a956b19d7987b06a1f9632c8e6a8102038109ecbfb5a9c20a",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5129.47696788",
+        "totalCostsUsd": "106.6205931",
+        "conservativeNetPnlUsd": "129.47696788",
+        "realizedPnlUsd": "129.47696788",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-6.24447437",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "59ac9eb40331ce3665db3469ab2c8600d05df71b77d6397b07995adfb0269b4c",
+      "candidateId": "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "parameterHash": "457c3a97639a4b3f0734722d4ca7efac6ea548c56a91272b11a5908580d9981d",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 65,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "7edd2f3205519066ae204b68e5dfcf805ee6cc1a0236a1c86168f37bace071f3",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5067.36153357",
+        "totalCostsUsd": "119.06703787",
+        "conservativeNetPnlUsd": "67.36153357",
+        "realizedPnlUsd": "67.36153357",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-8.98803918",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "77d8d06001f4add510750f20d3e549653e1ba7281f4420eb165f7093d9da98c6",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "c95a8e3a50288d6b3230507911c3102fd967066397c87e1adbdf639097b7998e",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "552e99bfca63af4628ca818f81252f308b3ff2f40ba5e73103d862cbb64cf9e0",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.13743247",
+        "totalCostsUsd": "3.53289721",
+        "conservativeNetPnlUsd": "6.13743247",
+        "realizedPnlUsd": "6.13743247",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "49f3c290b2c0ca7d09e783786dc81bb79bf7f4b941db8c1e664d8c6480dba96a",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "3aa0a61aa6c88d777f90ff35f0d31bce17e79eece6368cc9c43f080608c776d2",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "842c5228e936644da990b8fd8eb08c4bf9eeaa5ac8cccb96044f687781c31ea1",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.23286694",
+        "totalCostsUsd": "3.58150433",
+        "conservativeNetPnlUsd": "4.23286694",
+        "realizedPnlUsd": "4.23286694",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437127"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "0dbd0021ae6da10c37fe80627b085254722ebc47f318f430ee860b20cb89424f",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "c95a8e3a50288d6b3230507911c3102fd967066397c87e1adbdf639097b7998e",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "ca1e85933b14d6583615eda34f0a1f710450795c7489a2dc32a59f6477e655ca",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.35551877",
+        "totalCostsUsd": "17.80368523",
+        "conservativeNetPnlUsd": "30.35551877",
+        "realizedPnlUsd": "30.35551877",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.159204"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "a53b86feb7924aec340de80dcb69ae224fd2ee0ac0792190a6eb02c8b713fcfb",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "3aa0a61aa6c88d777f90ff35f0d31bce17e79eece6368cc9c43f080608c776d2",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "5d1f1949c643891461009215e3a01ddf31113581611ded505df888991decbfd2",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1020.38357242",
+        "totalCostsUsd": "18.37880383",
+        "conservativeNetPnlUsd": "20.38357242",
+        "realizedPnlUsd": "20.38357242",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237625"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "6033edbe27e681f200326b53f3521c8574fdc45531326f758473d513c9f980fb",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "c95a8e3a50288d6b3230507911c3102fd967066397c87e1adbdf639097b7998e",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "a42015f17de4263d6bd528bee6cecc70982766c30ba1c7c0b114e47637b2f9d6",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5135.72144225",
+        "totalCostsUsd": "100.37611873",
+        "conservativeNetPnlUsd": "135.72144225",
+        "realizedPnlUsd": "135.72144225",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b8ee5d5ec255cabc26bd58b3f9bc3d9904f1a7ecbd147ee8bce968c9ab3faa6b",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "254c303076c53b80dcb6d57d35de986a4e30bd0f37ba39daf0183046d5cf25e8",
+      "candidateId": "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "parameterHash": "3aa0a61aa6c88d777f90ff35f0d31bce17e79eece6368cc9c43f080608c776d2",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "c14133b87d43c801bb8f0d9cc8f44e465d6e508d06e91040e0616d78814521c9",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5076.34957275",
+        "totalCostsUsd": "110.07899869",
+        "conservativeNetPnlUsd": "76.34957275",
+        "realizedPnlUsd": "76.34957275",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "5d67f3d51ba9256ba0ca401e2823ef8b7daed24d016c81d79fe1525c6069bbf5",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "01ee67b9b7195bec188cf7ad2042272a9828f931d3474b852726c383f47bad26",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "e44be5d2b78251af857d448628e60fccb413daa181ce0125fba7bd4c823807ef",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "52e34e39fe2de08a318426469891c2ac917c0944dc67d87e949e85f2ee0af3b9",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.13743247",
+        "totalCostsUsd": "3.53289721",
+        "conservativeNetPnlUsd": "6.13743247",
+        "realizedPnlUsd": "6.13743247",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "dd3f24bd06c21fb069f3ae09ec0be30d2d40e6ab5a5685f0b57b96ea856594ed",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "2bedc37fc013b1630f04061172b48ba321cfcabbd58c59c867b1bd61a2308ae8",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "36bdbf1809e09d68c183124040605bb784aaec4746068d4a14726237af6570dc",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.23286694",
+        "totalCostsUsd": "3.58150433",
+        "conservativeNetPnlUsd": "4.23286694",
+        "realizedPnlUsd": "4.23286694",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437127"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "0b2ff0b2c638bd540ff689b641028ad5ab504ecdb4331f07e3e1bf2bb005b6a9",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "e44be5d2b78251af857d448628e60fccb413daa181ce0125fba7bd4c823807ef",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "a035317ca8f28226c134f96565a53ced0ea94fae85e7fdf454d31ebcf450acc3",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.35551877",
+        "totalCostsUsd": "17.80368523",
+        "conservativeNetPnlUsd": "30.35551877",
+        "realizedPnlUsd": "30.35551877",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.159204"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "9bfb8567cf614b5d026d3e26de215b50dc4d032ffa10e0c8ed8eaa442f1a7039",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "2bedc37fc013b1630f04061172b48ba321cfcabbd58c59c867b1bd61a2308ae8",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "b8a8a6b12c5a00785b7869200a011e504d439776fa50a8cf39dffdd9ea4754a6",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1020.38357242",
+        "totalCostsUsd": "18.37880383",
+        "conservativeNetPnlUsd": "20.38357242",
+        "realizedPnlUsd": "20.38357242",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237625"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "80d1f270358a7e1a40047e69d932907bf681b7e1ac8ef86865226a58792be918",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "e44be5d2b78251af857d448628e60fccb413daa181ce0125fba7bd4c823807ef",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "4de44057242b51a25f7ab8040316d01bd40d4a89611f7c91cb6a8c8927c7ae2c",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5135.72144225",
+        "totalCostsUsd": "100.37611873",
+        "conservativeNetPnlUsd": "135.72144225",
+        "realizedPnlUsd": "135.72144225",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "1dfdd7dfea30613d85f210ec4dd0283746208a15554d6f720a5447b78a810d2d",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "65a8aaf35c2b2d5ba8ab5f603987c748f4d25a36fb6165848cb43fee31d96ee6",
+      "candidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "parameterHash": "2bedc37fc013b1630f04061172b48ba321cfcabbd58c59c867b1bd61a2308ae8",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "C",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+      "modelHash": "5e56f0f43edf77295e96826e4a0d2b8ce22d2128100cf350df8a4c47cea893b7",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5076.34957275",
+        "totalCostsUsd": "110.07899869",
+        "conservativeNetPnlUsd": "76.34957275",
+        "realizedPnlUsd": "76.34957275",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "9e9e6c63414d16bee05cfcf3f5b58e2f3f3b70c71f4ad496359198a3e72e9da0",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "0e6f3d728df4a14a54010a13e78922ef4e5ccc125493496adb091328d97c3ade",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "3e452c5f7870d53ebaad294e148612cedaf486cfe25cac408930d2cebfb2aacf",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "66813de2eb1f8a84916482fc5bbbac74fb85d3cd19acc90400529b439278e53a",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.15621621",
+        "totalCostsUsd": "3.51411347",
+        "conservativeNetPnlUsd": "6.15621621",
+        "realizedPnlUsd": "6.15621621",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01878374",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "292f5dc077e7b224ccc326d287e0a226f05ea1933c5ec303e5d7810139d72f19",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "cb2ccd2d1d7d9d36f287a092f8868e060b314043eccceae9aef583a8ee7b6af5",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "3f1c3101e4712584224c31b4842b0b6bdb7f4213eacdcd38304b0479af559845",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.24519662",
+        "totalCostsUsd": "3.56917464",
+        "conservativeNetPnlUsd": "4.24519662",
+        "realizedPnlUsd": "4.24519662",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437126"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01232968",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "4fc5b83751bb99f6a2bd7c4fb9bad7ed07b2c3be1be72b03d6942044decd4d5d",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "3e452c5f7870d53ebaad294e148612cedaf486cfe25cac408930d2cebfb2aacf",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "3fe2e96e5f8d846a39efc9af9ba22132d9a81c354a8d93c0aa54a015441a1cba",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.11037387",
+        "totalCostsUsd": "18.04883012",
+        "conservativeNetPnlUsd": "30.11037387",
+        "realizedPnlUsd": "30.11037387",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.15920399"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.2451449",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "140ac7da2cf4ad605f3b73c0c500c89529953252fd6cd854825b5e30352135fb",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "cb2ccd2d1d7d9d36f287a092f8868e060b314043eccceae9aef583a8ee7b6af5",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "f065084616c1570dae79dcfc67d4f46431e2c27c8fad63bf7b6a64e835689573",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1019.98714913",
+        "totalCostsUsd": "18.77522711",
+        "conservativeNetPnlUsd": "19.98714913",
+        "realizedPnlUsd": "19.98714913",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237624"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.39642329",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "8c5d52af90724ed109ea3c42733f0d7ad6b4d263508a98f31e1799f5d37193f8",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "3e452c5f7870d53ebaad294e148612cedaf486cfe25cac408930d2cebfb2aacf",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "dad54a27ddaf35e6907414bde8564f84c7472301e8ab21adfc731f2bcad5b2b4",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5129.47696788",
+        "totalCostsUsd": "106.6205931",
+        "conservativeNetPnlUsd": "129.47696788",
+        "realizedPnlUsd": "129.47696788",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-6.24447437",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "a097d8654d6d3f7167fe44f3380deadbf9f1d1b06cb6424d0fb27bd326067bdb",
+        "entryDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "cdb08c7afdbcd187ad144990921f2ef63f71810d0296890b217f0fcac05b3a01",
+      "candidateId": "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d",
+      "parameterHash": "cb2ccd2d1d7d9d36f287a092f8868e060b314043eccceae9aef583a8ee7b6af5",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 5
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "b68f1b0f57c6e3f4cb7f12334d2450a19d95cb794352b3bcce36d9b2ece26977",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5067.36153357",
+        "totalCostsUsd": "119.06703787",
+        "conservativeNetPnlUsd": "67.36153357",
+        "realizedPnlUsd": "67.36153357",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-8.98803918",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "b111376207f8c65518b0cec22f08df5ed0f39f629a782fdf1bcc9b37f1481a36",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 30,
+          "median": 30,
+          "max": 30
+        }
+      }
+    },
+    {
+      "trialId": "f2149212c4189dc21f7241dfaaea7a89b81322058ad75708f2f223058c03f11d",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "fbbd7f00b2cdadd82378a50718e7021ae1272c2171eab63188d60fd28be02d52",
+      "preset": 150,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "8dab67f6e5cb063c155628ac785b1030be46c4c87eb38a11211380d0f6f4735e",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "156.15621621",
+        "totalCostsUsd": "3.51411347",
+        "conservativeNetPnlUsd": "6.15621621",
+        "realizedPnlUsd": "6.15621621",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.33053141",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "9.67032968"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01878374",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "95b4bd91d975002cb6361f167bf9f0d839e6b76423645fcff34d8c724242dba4",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "e7caa8836b45f752eb51966e5899288b1a4d77b6b5715738e3dc541ef03bf371",
+      "preset": 150,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "fa1de41bfac9163ed2c992122e6c8b5f95549e6c2ed51fdca2b343729f1345de",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "150",
+        "endingCashUsd": "154.24519662",
+        "totalCostsUsd": "3.56917464",
+        "conservativeNetPnlUsd": "4.24519662",
+        "realizedPnlUsd": "4.24519662",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "2.51920259",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "7.81437126"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "0.01232968",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "6366ec3e607b2ab68fcafd804c56feae7eb45d4a673b06789ebe1ed48b82e331",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "fbbd7f00b2cdadd82378a50718e7021ae1272c2171eab63188d60fd28be02d52",
+      "preset": 1000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "a5a7d52c98decdd97e3ae47d2ce269f40f9995d405666238b3a310b9d153d1d8",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1030.11037387",
+        "totalCostsUsd": "18.04883012",
+        "conservativeNetPnlUsd": "30.11037387",
+        "realizedPnlUsd": "30.11037387",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "11.70057857",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "48.15920399"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.2451449",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "ed56a7aaefff6843c5930cd81bc088a651e88ce5eb278a2aaafc0577c324d277",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "e7caa8836b45f752eb51966e5899288b1a4d77b6b5715738e3dc541ef03bf371",
+      "preset": 1000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "6cde6df5037dbfc6d7dc1409fac2daaafd448b183cda318a25c1ffbd97361dc6",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "1000",
+        "endingCashUsd": "1019.98714913",
+        "totalCostsUsd": "18.77522711",
+        "conservativeNetPnlUsd": "19.98714913",
+        "realizedPnlUsd": "19.98714913",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "12.90971042",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "38.76237624"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-0.39642329",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "33e33817802101ffb3325ec1271e7430c9c5a35d0f99f1ec0df2097ce16d2e05",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "fbbd7f00b2cdadd82378a50718e7021ae1272c2171eab63188d60fd28be02d52",
+      "preset": 5000,
+      "scenario": "base",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "8265e9d71044e6960c5b697e68af0e4be2bf4e4031851baeb964652ba21f6961",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5129.47696788",
+        "totalCostsUsd": "106.6205931",
+        "conservativeNetPnlUsd": "129.47696788",
+        "realizedPnlUsd": "129.47696788",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "65.15073544",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "236.09756098"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-6.24447437",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "767f844de6219b3ce44af5bb8e713edad49dfdfe06fa2d5c6724dca0ecab2baf",
+        "entryDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "finalExitDelaySec": {
+          "min": 5,
+          "median": 5,
+          "max": 5
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    },
+    {
+      "trialId": "42282274df7398571aff9757646a1aad65388f9a4ea26d23ec3e772e07a36d01",
+      "candidateId": "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "parameterHash": "e7caa8836b45f752eb51966e5899288b1a4d77b6b5715738e3dc541ef03bf371",
+      "preset": 5000,
+      "scenario": "stress",
+      "parameters": {
+        "rating": 75,
+        "exit": "FIXED",
+        "entryDelaySec": 15
+      },
+      "sourceProfileHash": "175bd20f6712aad90c12734f6162cf33dd8454e914d9a1b55641d9d889bc0add",
+      "modelHash": "3069edf3cbbdbd78283158239b420a93541ac331215ff826713bf6e87a7ac165",
+      "computationStatus": "complete",
+      "evidenceStatus": "insufficient_evidence",
+      "error": null,
+      "metrics": {
+        "initialUsd": "5000",
+        "endingCashUsd": "5067.36153357",
+        "totalCostsUsd": "119.06703787",
+        "conservativeNetPnlUsd": "67.36153357",
+        "realizedPnlUsd": "67.36153357",
+        "unrealizedWriteDownUsd": "0",
+        "maxDrawdownUsd": "77.01473252",
+        "noTradePnlUsd": "0",
+        "economicNetPnlUsd": null,
+        "closedTrades": 1,
+        "writeDowns": 0,
+        "tradeCount": 1,
+        "rejectedSignals": 0,
+        "unpricedPositions": 0,
+        "accountingPriceContributionUsd": "186.42857144"
+      },
+      "diagnostics": {
+        "skipped": {
+          "pending_at_end": 0
+        },
+        "baselineDeltaUsd": "-8.98803918",
+        "accountingBridge": "net_plus_modeled_costs_not_costfree_rerun",
+        "behaviorHash": "aaa1f4e66170a9ce67206962392f6b0bc0cc2322f50da070fa71eed99387693d",
+        "entryDelaySec": {
+          "min": 25,
+          "median": 25,
+          "max": 25
+        },
+        "finalExitDelaySec": {
+          "min": 15,
+          "median": 15,
+          "max": 15
+        },
+        "holdingSecs": {
+          "min": 20,
+          "median": 20,
+          "max": 20
+        }
+      }
+    }
+  ],
+  "selection": {
+    "procedure": "exploratory_min_preset_scenario_return_then_drawdown_v1",
+    "rankedCandidateIds": [
+      "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+      "59836b319f4e1e47222d8ace125462c22a8d2c414894c55e932e5e0369d454a0",
+      "a378abb52d65d91cae9346482d3e1063c4c5b3e9ed0d00a071dea8dc48e6fb54",
+      "e68a12bae89fda2240541d00ec6cd21fe94319b5cdd1964f3a65ebb997c993cf",
+      "0ac71ac8c76454f058129967d28c0a0e0b9ba7fd27e96908dbc2957933eb6c76",
+      "18b789395d9ef104ba0a36570d9a71684abe2a34494566672954a0e5f04ebe34",
+      "b2ea94186d080a66245253a007e60c83c53b26f71f6498c16043a8b2f8cb3447",
+      "f5084b9a20c0e9f526981aa05744080d5a7802f88cd1cce2e13c4375810b900d"
+    ],
+    "selectedCandidateId": "2027b7e1290da9c8c93606ccffb5c9270f173b0c48aa84241a15ac4900762c51",
+    "selectedAt": "2026-10-09T18:00:00.000Z",
+    "recommendation": "no_promotion",
+    "reasonCodes": [
+      "future_proposal_only",
+      "already_viewed_data",
+      "profile_gates_unavailable"
+    ]
+  },
+  "futureOos": {
+    "status": "not_started",
+    "eligibleAfter": "2026-10-09T19:15:00.000Z",
+    "embargoSec": 4500,
+    "alreadyViewedDataExcluded": true
+  },
+  "unknowns": [
+    "profile_gates_unavailable"
+  ],
+  "executionAuthorized": false,
+  "promotionAuthorized": false,
+  "reportId": "a047c2423f72c95e0ea95f5e583c33c5e90b17238148722a51310880c6d23a32",
+  "generatedAt": "2026-10-09T18:00:00.000Z"
+}

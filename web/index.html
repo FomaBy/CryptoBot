@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#142823">
+  <meta name="description" content="Личный кабинет CryptoBot: кошельки, исследование стратегий и задачи разработки.">
+  <title>CryptoBot · Кабинет</title>
+  <link rel="stylesheet" href="/bot/styles.css">
+  <script src="/bot/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержимому</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Основная навигация">
+      <a class="brand" href="#overview" aria-label="CryptoBot — обзор">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 6h14l5 10-5 10H9L4 16z"/><path d="m12 11-3 5 3 5m8-10 3 5-3 5m-3-12-2 14"/></svg></span>
+        <span>CryptoBot<span class="brand-caption">RESEARCH WORKSPACE</span></span>
+      </a>
+      <p class="nav-label">ЛИЧНЫЙ КАБИНЕТ</p>
+      <nav class="nav-list">
+        <a class="nav-link active" href="#overview" data-tab="overview" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Обзор</a>
+        <a class="nav-link" href="#wallets" data-tab="wallets"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 8V5a2 2 0 0 0-2-2L5 6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h15V8H5"/><path d="M20 12h-5v5h5m-3-2.5h.1"/></svg>Кошельки<span class="nav-count" id="wallet-nav-count">—</span></a>
+        <a class="nav-link" href="#backlog" data-tab="backlog"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 3h6v4H9zm-1 9h.1M11 12h5m-8 5h.1M11 17h5"/></svg>Задачи<span class="nav-count" id="task-nav-count">—</span></a>
+        <a class="nav-link" href="#research" data-tab="research"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6m-5 0v7L4 20h16l-6-10V3M7 15h10"/></svg>Исследование</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="network-mini"><span class="network-symbol" aria-hidden="true">R</span><span>Robinhood Chain<small>Pons V1 / V2 · 4663</small></span></div>
+        <div class="sidebar-note"><span class="status-dot muted-dot" aria-hidden="true"></span>Торговля не активирована</div>
+        <a class="back-link" href="/crypto/">↗ Рынок · AI Crypto Statistics</a>
+        <a class="back-link" href="/">← Вернуться в Aistat</a>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">Рабочее пространство <span aria-hidden="true">/</span> <strong id="breadcrumb-title">Обзор</strong></div>
+        <div class="topbar-right"><span class="environment-badge">Research</span><div class="account"><span class="avatar" id="account-avatar" aria-hidden="true">·</span><span><strong id="account-name">Проверяем вход</strong><small id="account-description">Защищённый кабинет</small></span></div></div>
+      </header>
+
+      <main id="main" tabindex="-1">
+        <div id="session-gate" class="session-gate" aria-live="polite">
+          <div class="gate-orbit" aria-hidden="true">C</div>
+          <p class="eyebrow">CRYPTOBOT WORKSPACE</p>
+          <h1 id="gate-title">Подключаем ваш кабинет</h1>
+          <p id="gate-copy">Проверяем сессию и доступ к данным аккаунта.</p>
+          <a id="login-link" class="button primary" href="/login?next=%2Fbot%2F" hidden>Войти в Aistat <span aria-hidden="true">↗</span></a>
+          <button id="retry-session" class="button secondary" type="button" hidden>Попробовать ещё раз</button>
+        </div>
+
+        <div id="dashboard" hidden>
+          <div id="page-message" class="notice" role="status" hidden></div>
+          <section id="panel-overview" class="view" aria-labelledby="overview-title">
+            <div class="page-heading"><div><p class="eyebrow">ВАШ CRYPTOBOT</p><h1 id="overview-title">От данных — к решениям.</h1><p class="page-subtitle">Кошельки, исследование и развитие бота в одном пространстве.</p></div><button class="button secondary small" id="refresh-button" type="button"><span aria-hidden="true">↻</span> Обновить</button></div>
+            <div class="overview-grid">
+              <article class="hero-card">
+                <div class="hero-top"><span class="pill dark-pill"><span class="status-dot" aria-hidden="true"></span>ПОДГОТОВКА К ИССЛЕДОВАНИЮ</span><span class="hero-index" aria-hidden="true">01 / 04</span></div>
+                <h2>Сначала доказательства.<br>Потом сделки.</h2>
+                <p>Исследуем поведение публичных кошельков, проверяем доступность входа и выхода, учитываем реальные издержки.</p>
+                <div class="hero-bottom"><a class="button light" href="#research">Открыть исследование <span aria-hidden="true">↗</span></a><span class="hero-footnote">Robinhood Chain<br>Pons V1 / V2</span></div>
+                <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><span class="orbit-point"></span></div>
+              </article>
+              <article class="card setup-card">
+                <div class="card-heading"><h2>Статус системы</h2><span class="pill neutral" id="mode-badge">Проверяем</span></div>
+                <div class="system-row"><span>Исследование</span><strong id="research-state">Получаем данные…</strong></div>
+                <div class="system-row"><span>Paper trading</span><strong id="paper-state">—</strong></div>
+                <div class="system-row"><span>Реальная торговля</span><strong id="live-state">—</strong></div>
+                <div class="system-row"><span>AI-исполнитель задач</span><strong id="worker-state">Не подключён</strong></div>
+                <div class="system-row"><span>Robinhood RPC</span><strong id="network-state">Проверяем…</strong></div>
+                <p class="helper-text">Подключение кошелька подтверждает владение адресом. Разрешение на торговлю оформляется отдельно.</p>
+              </article>
+            </div>
+            <div class="metrics-grid">
+              <article class="metric-card"><span class="metric-label">Подключённые кошельки</span><div class="metric-number" id="wallet-metric">—</div><span class="metric-note">Только вашего аккаунта</span></article>
+              <article class="metric-card"><span class="metric-label">Подтверждённая доходность</span><div class="metric-number">—<span class="metric-unit">USD</span></div><span class="metric-note">Ещё нет проверенных результатов</span></article>
+              <article class="metric-card"><span class="metric-label">Сделки бота</span><div class="metric-number" id="trade-metric">—</div><span class="metric-note" id="trade-note">Исполнитель не активирован</span></article>
+              <article class="metric-card"><span class="metric-label">Открытые задачи</span><div class="metric-number" id="task-metric">—</div><span class="metric-note">Развитие вашего пространства</span></article>
+            </div>
+            <div class="bottom-grid">
+              <article class="card budget-card"><div class="card-heading"><div><p class="eyebrow">ПАРАМЕТРЫ ИССЛЕДОВАНИЯ</p><h2>Выберите масштаб</h2></div><span class="mini-label">USD</span></div><p class="card-description">Пресет для оценки стратегии. Это не перевод средств и не запуск торговли.</p>
+                <fieldset class="preset-options" id="preset-options"><legend class="sr-only">Бюджет исследования</legend>
+                  <label class="preset"><input type="radio" name="preset" value="150"><span class="preset-capital">$150</span><span class="preset-entry">Вход $10</span></label>
+                  <label class="preset"><input type="radio" name="preset" value="1000"><span class="preset-capital">$1 000</span><span class="preset-entry">Вход $50</span></label>
+                  <label class="preset"><input type="radio" name="preset" value="5000"><span class="preset-capital">$5 000</span><span class="preset-entry">Вход $250</span></label>
+                </fieldset><div class="budget-footer"><span id="preset-status" role="status">Получаем сохранённый пресет…</span><button class="button secondary small" id="save-preset" type="button" disabled>Сохранить</button></div>
+              </article>
+              <article class="card next-card"><div class="card-heading"><h2>Ваш следующий шаг</h2><span class="step-count">01</span></div><h3>Свяжите кошелёк с аккаунтом</h3><p class="card-description">Выберите расширение браузера и подтвердите адрес одной подписью. Средства останутся в вашем кошельке.</p><button class="text-button" type="button" data-connect>Подключить кошелёк <span aria-hidden="true">↗</span></button></article>
+            </div>
+          </section>
+
+          <section id="panel-wallets" class="view" aria-labelledby="wallets-title" hidden>
+            <div class="page-heading"><div><p class="eyebrow">ВАШ АККАУНТ</p><h1 id="wallets-title">Кошельки</h1><p class="page-subtitle">Адреса, владение которыми вы подтвердили.</p></div><button class="button primary" type="button" data-connect><span aria-hidden="true">＋</span> Подключить кошелёк</button></div>
+            <div class="info-banner"><span class="info-symbol" aria-hidden="true">i</span><p><strong>Ваши средства — под вашим контролем.</strong> Подпись подтверждает адрес и не разрешает расходы. Здесь нет активного торгового мандата.</p></div>
+            <div class="card collection-card"><div class="card-heading"><h2>Мои кошельки <span class="inline-count" id="wallet-count">—</span></h2><span class="mini-label">CHAIN 4663</span></div><div id="wallet-list" class="wallet-list" aria-live="polite"><p class="list-loading">Загружаем кошельки…</p></div></div>
+            <div class="two-column"><article class="card explanatory-card"><span class="section-number">01</span><h3>Подключение ≠ торговля</h3><p>Проверяем подпись на сервере и связываем адрес с вашим аккаунтом. Секретная фраза и приватный ключ не нужны.</p></article><article class="card explanatory-card"><span class="section-number">02</span><h3>Личные адреса и watchlist</h3><p>Публичные адреса для исследования — отдельная выборка. Наблюдение за кошельком не подтверждает владение им и не даёт прав на средства.</p></article></div>
+          </section>
+
+          <section id="panel-backlog" class="view" aria-labelledby="backlog-title" hidden>
+            <div class="page-heading"><div><p class="eyebrow">РАЗВИТИЕ ПРОДУКТА</p><h1 id="backlog-title">Задачи</h1><p class="page-subtitle">Сформулируйте цель и результат, по которому можно проверить выполнение.</p></div><button id="new-task-button" class="button primary" type="button"><span aria-hidden="true">＋</span> Новая задача</button></div>
+            <div class="worker-banner"><span class="worker-icon" aria-hidden="true">✧</span><div><strong>AI-исполнитель ещё не подключён</strong><p>Задачи сохраняются в вашем аккаунте. Автоматическая разработка и публикация пока не запускаются.</p></div><span class="pill neutral">Не активирован</span></div>
+            <div class="card collection-card"><div class="card-heading task-toolbar"><h2>Ваш backlog <span class="inline-count" id="task-count">—</span></h2><label class="filter-label">Показать<select id="task-filter"><option value="active">Открытые</option><option value="all">Все задачи</option><option value="cancelled">Отменённые</option><option value="done">Выполненные</option></select></label></div><div id="task-list" class="task-list" aria-live="polite"><p class="list-loading">Загружаем задачи…</p></div></div>
+          </section>
+
+          <section id="panel-research" class="view" aria-labelledby="research-title" hidden>
+            <div class="page-heading"><div><p class="eyebrow">ОБЩИЙ ИСТОЧНИК ДАННЫХ</p><h1 id="research-title">Исследование</h1><p class="page-subtitle">Опубликованный анализ ACS. Тот же снимок доступен в /crypto.</p></div><a class="button secondary" href="/crypto/">Открыть рынок ↗</a></div>
+            <article class="card backtest-card" aria-labelledby="bt-title">
+              <div class="card-heading"><div><p class="eyebrow">ИСТОРИЧЕСКИЙ ЭКСПЕРИМЕНТ</p><h2 id="bt-title">Бэктест за 14 дней</h2></div><span class="pill neutral">Без сделок</span></div>
+              <p class="card-description">Проверка доступной истории ACS для Robinhood Chain · Pons. Это ретроспективное исследование, не независимый будущий OOS-тест и не разрешение торговли.</p>
+              <form id="bt-form">
+                <div class="bt-controls"><label class="form-label" for="bt-preset">Капитал / вход, USD<select id="bt-preset"><option value="150">150 / 10 USD</option><option value="1000">1 000 / 50 USD</option><option value="5000">5 000 / 250 USD</option></select></label><label class="form-label" for="bt-mode">Режим<select id="bt-mode"><option value="strict">Проверить, хватает ли данных</option><option value="scenario">Посчитать сделки по истории</option></select></label></div>
+                <div class="bt-actions"><button class="button secondary small" id="bt-coverage-refresh" type="button">Проверить покрытие</button><span class="helper-text">Период фиксируется по времени сервера в UTC.</span></div>
+                <div id="bt-coverage" class="bt-coverage"><p class="helper-text">Сначала проверьте покрытие истории. Расчёт не запускается автоматически.</p></div>
+                <fieldset id="bt-window-options" class="bt-window-options" disabled><legend>Выберите период расчёта</legend><label><input type="radio" name="bt-window" value="14d" checked><span>Последние 14 дней <small id="bt-full-period">Границы пока неизвестны</small></span></label><label><input type="radio" name="bt-window" value="available"><span>Только доступная история <small id="bt-available-period">Границы пока неизвестны</small></span></label></fieldset>
+                <p id="bt-scope-note" class="analysis-gate">Запрошенные даты не сокращаются автоматически. Для неполной истории сценарий требует явного выбора доступного периода.</p>
+                <div class="bt-actions"><button class="button primary" id="bt-submit" type="submit" disabled>Проверить, хватает ли данных</button><span class="helper-text" id="bt-submit-hint">Новый запуск сохранится в вашем аккаунте.</span></div>
+              </form>
+              <div id="bt-message" class="notice" role="status" hidden></div>
+              <div class="bt-history-head"><h3>Сохранённые запуски</h3><button class="button secondary small" id="bt-runs-refresh" type="button">Обновить список</button></div>
+              <div id="bt-runs" class="bt-runs" aria-live="polite"><p class="helper-text">История запусков ещё не загружена.</p></div>
+              <section id="bt-report" class="bt-report" aria-label="Отчёт выбранного запуска" aria-live="polite"></section>
+            </article>
+            <article class="card optimization-card" aria-labelledby="op-title">
+              <div class="card-heading"><div><p class="eyebrow">ОГРАНИЧЕННОЕ ИССЛЕДОВАНИЕ</p><h2 id="op-title">Сравнение 8 вариантов</h2></div><span class="pill neutral">48 испытаний</span></div>
+              <p class="card-description">Два порога оценки × два правила выхода × две задержки входа. Каждый вариант проверяется на трёх USD-пресетах в базовом и стресс-сценарии. Все результаты, включая неудачные, сохраняются.</p>
+              <div class="analysis-gate op-warning">Фиксированный конец истории: 9 октября 2026, 17:21 UTC. Полных 14 дней нет; данные уже изучались. Это исследовательский подбор, не независимый OOS. Будущая проверка ещё не начата. Выбор гипотезы не включает торговлю и не продвигает стратегию.</div>
+              <details class="analysis-details" open><summary>Зафиксированные варианты и расходы перед запуском</summary><p class="helper-text">Пороги ACS: 65 и 75. Задержки входа: 5 и 15 секунд. C — частями: 75% на 1,5×, остаток на 2×, стоп −40%, время 30 минут; после первой продажи trailing 20% и максимум 15 минут для остатка. FIXED — полный выход на 2×, стоп −40%, время 60 минут. Реальные интервалы расчёта зависят от доступных наблюдений.</p><p class="analysis-gate">База на каждую сторону: fee 1% + tax 10% + slippage 1%; gas 0,03 USD на покупку и каждую продажу, отдельно impact. Tax 10% — допущение, не подтверждённая ставка токена. Stress: ликвидность ×0,5, slippage ×2, дополнительно 10 секунд задержки входа и выхода. Расходы не снижаются для улучшения результата.</p><p class="helper-text">Исторические проверки migration, route state, hard knife, devDump и других защит профиля недоступны полностью. Оценка ликвидности — приближение, возможность реальной продажи не доказана.</p></details>
+              <div class="bt-actions"><button class="button primary" id="op-start" type="button" disabled>Сравнить 8 вариантов</button><span class="helper-text">Один запуск: ровно 48 испытаний, без бесконечного поиска.</span></div>
+              <div id="op-message" class="notice" role="status" hidden></div>
+              <div class="bt-history-head"><h3>Сохранённые сравнения</h3><button class="button secondary small" id="op-runs-refresh" type="button">Обновить список</button></div>
+              <div id="op-runs" class="bt-runs" aria-live="polite"><p class="helper-text">История сравнений ещё не загружена.</p></div>
+              <section id="op-report" class="bt-report" aria-label="Отчёт сравнения вариантов" aria-live="polite"></section>
+            </article>
+            <article class="card shared-analysis" aria-labelledby="shared-analysis-title"><div class="card-heading"><div><p class="eyebrow">AI CRYPTO STATISTICS</p><h2 id="shared-analysis-title">Общий анализ токенов</h2></div><span class="pill neutral">Только чтение</span></div><p class="card-description">Сеть 4663 · только токены с отметкой Pons у источника. Оценки ACS не являются допуском CryptoBot к торговле.</p><div class="analysis-actions"><button class="button secondary small" id="analysis-latest" type="button">Загрузить свежий снимок</button><button class="button secondary small" id="analysis-retry" type="button" hidden>Повторить запрос снимка</button><a class="text-button" id="analysis-common-link" href="/crypto/analysis.html">Общая страница анализа ↗</a></div><div id="analysis-message" class="notice" role="status" hidden></div><div id="analysis-provenance"></div><p id="analysis-coverage" class="helper-text">Данные загружаются при открытии раздела. Автоматического опроса нет.</p><div id="analysis-list" class="analysis-list" aria-live="polite"></div></article>
+            <article class="card bot-research-note"><h2>Результат стратегии CryptoBot ещё не подтверждён</h2><p class="card-description">Общий анализ описывает токен. История доступного нам исполнения, проверка стратегии на новых данных и доходность бота остаются отдельным исследованием.</p></article>
+            <div class="research-steps"><article class="card"><span class="section-number">01</span><h3>Подлинность</h3><p>Переводы, связанные адреса, неизвестная себестоимость и токены без ликвидности.</p><span class="stage-status">Требуется проверка</span></article><article class="card"><span class="section-number">02</span><h3>Исполнимость</h3><p>Наш размер входа, задержка, доступность продажи, gas и полная стоимость сделки.</p><span class="stage-status">Требуется проверка</span></article><article class="card"><span class="section-number">03</span><h3>Будущая выборка</h3><p>Новые данные, сравнение с базовой стратегией и стресс-тесты после фиксации гипотезы.</p><span class="stage-status">Требуется проверка</span></article></div>
+            <div class="info-banner"><span class="info-symbol" aria-hidden="true">i</span><p><strong>AI может предлагать улучшения.</strong> Их применение требует независимых проверок внутри утверждённых правил. Лимиты риска и полномочия подписи не меняются моделью.</p></div>
+          </section>
+          <footer class="page-footer"><span>CryptoBot <span class="footer-divider">/</span> Robinhood Chain · Pons</span><span id="updated-at">Данные ещё не обновлены</span></footer>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="wallet-dialog" class="modal" aria-labelledby="wallet-dialog-title" aria-describedby="wallet-dialog-description">
+    <div class="modal-heading"><div><p class="eyebrow">ПОДТВЕРЖДЕНИЕ АДРЕСА</p><h2 id="wallet-dialog-title">Подключить кошелёк</h2></div><button class="icon-button" type="button" data-close="wallet-dialog" aria-label="Закрыть окно подключения">×</button></div>
+    <p class="modal-description" id="wallet-dialog-description">Выберите установленное расширение. Затем проверьте сообщение и подтвердите владение адресом подписью.</p>
+    <div id="provider-list" class="provider-list"></div>
+    <div id="wallet-message" class="notice" role="status" hidden></div>
+    <div id="signature-review" hidden><div class="signature-address" id="signature-address"></div><p class="helper-text">Подписывается только это сообщение для входа. Проверьте домен и адрес в окне кошелька.</p><pre class="siwe-message" id="siwe-message" tabindex="0" aria-label="Сообщение подтверждения владения"></pre><button id="sign-button" type="button" class="button primary full-width">Подписать подтверждение</button></div>
+    <p class="modal-footnote">Без транзакций, gas и разрешений на расходы. Поддерживаются установленные браузерные кошельки; подключение через QR пока недоступно.</p>
+  </dialog>
+
+  <dialog id="task-dialog" class="modal" aria-labelledby="task-dialog-title">
+    <div class="modal-heading"><div><p class="eyebrow">ВАШ BACKLOG</p><h2 id="task-dialog-title">Новая задача</h2></div><button class="icon-button" type="button" data-close="task-dialog" aria-label="Закрыть форму задачи">×</button></div>
+    <form id="task-form"><label class="form-label" for="task-title">Название <span aria-hidden="true">*</span></label><input id="task-title" name="title" maxlength="120" required placeholder="Например, сравнить расходы трёх пресетов" autocomplete="off">
+      <label class="form-label" for="task-description">Что нужно сделать <span aria-hidden="true">*</span></label><textarea id="task-description" name="description" rows="4" maxlength="4000" required placeholder="Опишите цель, контекст и ограничения"></textarea>
+      <label class="form-label" for="task-acceptance">Как проверить результат <span aria-hidden="true">*</span></label><textarea id="task-acceptance" name="acceptance" rows="3" maxlength="2000" required placeholder="Какие данные или изменения подтвердят выполнение?"></textarea>
+      <label class="form-label" for="task-priority">Приоритет</label><select id="task-priority" name="priority"><option value="p1">P1 · Обычный</option><option value="p0">P0 · Высокий</option><option value="p2">P2 · Низкий</option></select>
+      <div id="task-form-message" class="notice" role="status" hidden></div><p class="helper-text">Задача будет сохранена как запланированная. Её создание не запускает AI, публикацию сайта или торговлю.</p><div class="modal-actions"><button class="button secondary" type="button" data-close="task-dialog">Отмена</button><button id="task-submit" class="button primary" type="submit">Создать задачу</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="unlink-dialog" class="modal compact-modal" aria-labelledby="unlink-title"><div class="modal-heading"><h2 id="unlink-title">Отвязать адрес?</h2><button class="icon-button" type="button" data-close="unlink-dialog" aria-label="Закрыть">×</button></div><p id="unlink-address" class="mono break-all"></p><p class="modal-description">Связь с этим аккаунтом будет удалена. Это не отзыв on-chain разрешений и не продажа активов. Доступ расширения к сайту управляется в самом кошельке.</p><div id="unlink-message" class="notice" role="status" hidden></div><div class="modal-actions"><button class="button secondary" type="button" data-close="unlink-dialog">Сохранить связь</button><button id="confirm-unlink" class="button danger" type="button">Отвязать</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

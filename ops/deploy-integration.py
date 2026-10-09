@@ -122,15 +122,15 @@ elif action=='rollback':
   elif row['before'] is None and p.exists(): p.unlink()
 PY
 python3 "$BASE/apply.py" "$BASE" check
-python3 - "$BACKUP" <<'PY'
-import sqlite3,sys
-from pathlib import Path
-source=Path.home()/'cryptobot/state/app.sqlite'
-if source.exists():
- src=sqlite3.connect('file:'+str(source)+'?mode=ro',uri=True,timeout=5)
- dst=sqlite3.connect(str(Path(sys.argv[1])/'account-before.sqlite'))
- src.backup(dst);dst.close();src.close()
-PY
+/opt/alt/alt-nodejs24/root/usr/bin/node --input-type=module - "$HOME/cryptobot/state/app.sqlite" "$BACKUP/account-before.sqlite" <<'JS'
+import { DatabaseSync, backup } from 'node:sqlite';
+import { existsSync, chmodSync } from 'node:fs';
+if (existsSync(process.argv[2])) {
+ const source = new DatabaseSync(process.argv[2], { readOnly: true });
+ try { await backup(source, process.argv[3]); chmodSync(process.argv[3], 0o600); }
+ finally { source.close(); }
+}
+JS
 rollback() {
   python3 "$BASE/apply.py" "$BASE" rollback
   /usr/sbin/cloudlinux-selector restart --json --interpreter=nodejs --app-root=acs/app >/dev/null

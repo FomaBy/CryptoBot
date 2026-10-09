@@ -47,5 +47,4 @@
 | ID / приоритет | Работа | Статус / зависимости | Evidence выхода |
 |---|---|---|---|
 | B-024 / P1 | Конечный preregistered перебор ACS и аккаунтный отчёт. R-026 | DONE / B-023; E-022 | Frozen envelope до расчётов, независимый evaluator review, все 48 trials, baseline regression, причинность/ledger/isolation tests, UI и observed deployment. Не завершает B-009, B-014–019. |
-
-| B-025 / P1 | Повтор всего retained archive с замороженными champion/challenger. R-027 | IN_PROGRESS / B-024 | Preregistered cutoff/profiles; global earliest/universe/caps audit; prefix invariance; все 12+12 numerical reports, unchanged evaluator; результаты и пределы исторического покрытия. Новый runtime/deploy не требуется. |
+| B-025 / P1 | Повтор всего retained archive с замороженными champion/challenger. R-027 | DONE / B-024; E-023 | Preregistered cutoff/profiles; global earliest/universe/caps audit; prefix invariance; все 12+12 numerical reports, unchanged evaluator; результаты и пределы исторического покрытия. Новый runtime/deploy не требуется. |

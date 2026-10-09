@@ -67,7 +67,7 @@ Search envelope фиксирует разрешённые признаки/оп�
 
 `server/auth.js` проверяет существующую root-сессию через фиксированный HTTPS endpoint; `server/store.js` хранит данные по аккаунтам в SQLite. `server/wallets.js` формирует SIWE challenge для chain 4663 и проверяет EOA-подпись; contract wallets отклоняются. `server/app.js` реализует session/overview, приватные задачи, settings, wallet proof/unlink и audit; `server/index.js` запускает приложение без signer. Клиент не назначает owner и не переводит задачу в DONE. Приватный cohort не импортируется в пользовательские execution wallets.
 
-Исторически в первом инкременте прошли 12 тестов, включая A/B isolation, CSRF/origin, подмену полей, EOA wrong-signature/account/session, expiry/replay, два параллельных verify, отказ для contract wallet, отзыв root-сессии и SQLite close/reopen. Внешние сервисы замокированы. Это не production E2E и не доказательство торговой безопасности. В текущем опубликованном инкременте прошли 25 bot tests: shared analysis и исторические сценарии работают (E-017–020); paper/live отключены, AI worker не подключён. Связь с событиями E-006–E-008: [журнал](docs/execution-log.md).
+Исторически в первом инкременте прошли 12 тестов, включая A/B isolation, CSRF/origin, подмену полей, EOA wrong-signature/account/session, expiry/replay, два параллельных verify, отказ для contract wallet, отзыв root-сессии и SQLite close/reopen. Внешние сервисы замокированы. Это не production E2E и не доказательство торговой безопасности. В текущем опубликованном инкременте прошли 31 bot tests: shared analysis и исторические сценарии работают (E-017–020); paper/live отключены, AI worker не подключён. Связь с событиями E-006–E-008: [журнал](docs/execution-log.md).
 
 ## Общая аналитика
 
@@ -96,7 +96,7 @@ Search envelope фиксирует разрешённые признаки/оп�
 
 | ID | Требование, источник, статус | Критерий приёмки |
 |---|---|---|
-| R-027 | Повторить сделки по всей статистике без знания будущего. Запрос пользователя 9 октября 2026. IN_PROGRESS | До расчётов заморожены два профиля и cutoff; 12 full runs и 12 prefix validations без поиска. Измерены global earliest/counts и исторический Pons universe; caps/несовпадение prefix блокируют полный результат. Решения и fills используют только сохранённую последовательность, расходы/риски неизменны. Старые/новые наблюдения разделены описательно, не объявляются untouched OOS. Сохранены cash ledger, no-trade и неизвестные live conditions; без реальных покупок. |
+| R-027 | Повторить сделки по всей статистике без знания будущего. Запрос пользователя 9 октября 2026. DONE — bounded retained-archive replay, E-023 | До расчётов заморожены два профиля и cutoff; 12 full runs и 12 prefix validations без поиска. Измерены global earliest/counts и исторический Pons universe; caps/несовпадение prefix блокируют полный результат. Решения и fills используют только сохранённую последовательность, расходы/риски неизменны. Старые/новые наблюдения разделены описательно, не объявляются untouched OOS. Сохранены cash ledger, no-trade и неизвестные live conditions; без реальных покупок. |
 
 ## Открытые решения
 

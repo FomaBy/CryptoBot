@@ -84,7 +84,7 @@ Search envelope фиксирует разрешённые признаки/оп�
 
 | ID | Требование, источник, статус | Критерий приёмки |
 |---|---|---|
-| R-025 | Исторический прогон текущего ACS-профиля. U8. IN_PROGRESS | Из кабинета запускается и сохраняется аккаунтный отчёт с USD presets 150/10, 1000/50, 5000/250, точным UTC окном последних 14 дней, frozen source profile и исполненной model version. При неполном покрытии полный результат не выдумывается: доступный период выбирается пользователем явно. Сценарий по сохранённым наблюдениям отделён от доказанной исполнимости и точного воспроизведения всех live gates. Отчёт показывает coverage, gaps/caps, costs, ledger, cash, partial exits, conservative write-down, equity/drawdown, no-trade baseline и unknowns. Causal tests запрещают будущие признаки/мгновенные выходы; account tests проверяют доступ, CSRF, idempotency и restart/limits. Live/paper/AI не включаются. |
+| R-025 | Исторический прогон текущего ACS-профиля. U8. DONE — текущая исследовательская функция, E-020 | Из кабинета запускается и сохраняется аккаунтный отчёт с USD presets 150/10, 1000/50, 5000/250, точным UTC окном последних 14 дней, frozen source profile и исполненной model version. При неполном покрытии полный результат не выдумывается: доступный период выбирается пользователем явно. Сценарий по сохранённым наблюдениям отделён от доказанной исполнимости и точного воспроизведения всех live gates. Отчёт показывает coverage, gaps/caps, costs, ledger, cash, partial exits, conservative write-down, equity/drawdown, no-trade baseline и unknowns. Causal tests запрещают будущие признаки/мгновенные выходы; account tests проверяют доступ, CSRF, idempotency и restart/limits. Live/paper/AI не включаются. |
 
 ## Открытые решения
 

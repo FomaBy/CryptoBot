@@ -142,3 +142,25 @@ Read-only benchmark предварительной версии на host в 17:
 Browser integration QA с настоящими producer/consumer/API и синтетической isolated SQLite: явный выбор available, сохранённый strict и scenario, одна позиция с двумя partial sales, reload exact run, отдельные computation/evidence статусы, расходы и unknown economic PnL. Ширины 1440/700/390, inert metadata и отсутствие JS ошибок подтверждены; координатор независимо прошёл основной flow. Это fixture, не положительная production root-сессия. Production rollout и окончательный historical result будут записаны отдельно.
 
 Первый deployment job в 17:15:50 UTC остановился до записи файлов приложения: host Python sqlite3 не поддерживает `Connection.backup`. Код/DB приложения не изменены. Backup переведён на `node:sqlite.backup` проверенного Node 24 runtime; локальный read-only backup и чтение восстановленной копии подтвердили работоспособность. Повторный job по-прежнему требует все hash preconditions перед изменением.
+
+## E-020 — 9 октября 2026 — исторический прогон опубликован и выполнен на реальном архиве
+
+Повторный job завершился **17:20:45 UTC, rc=0**. Release **`web-bedf7d90e52adac2`**, bot source `c393098`, private ACS `9204180`. Все reviewed file/dependency hashes и прежние markers совпали; выполнен согласованный SQLite online backup через Node 24. Отдельный локальный тест подтвердил включение committed, но ещё не checkpointed WAL-записи в backup. Additive таблица результатов не меняет существующие аккаунты; rollback пользовательской DB не выполнялся. Bundle SHA-256 `00dea26d2ef97ef85a2272422142897c2cd986e7ece039e45c4bdb730dc8f227`.
+
+Координатор независимо подтвердил production release/health, live=false/paper=false, SHA-256 трёх реально отданных browser assets, 401 у backtest API без сессии, сохранение root и `/crypto`, корректный login gate в браузере. Положительный production root-login всё ещё не подтверждён; авторизованное сохранение/чтение/изоляция проверялись через локальный actual API fixture, а не объявляются выполненными под реальным Google-аккаунтом.
+
+Фактический production producer → строгий consumer прошёл шесть комбинаций: coverage, strict14d, scenario14d и available scenario для 150/1000/5000. Requested UTC: **2026-09-25 17:21:00 — 2026-10-09 17:21:00**; доступный архив начинается **2026-10-06 07:05:33.632**. На этом frozen cutoff: 2 112 916 записей / 14 780 токенов; 6 исторически подходящих кандидатов / 3 992 их наблюдения, `truncated=false`. Это весь найденный исторический cohort без выборки по будущему результату. Dataset hash: `abee8f6b9c4d6e27732d59cb17a2c44b8a9f3d51f6a915104bbda44005906d15`. Strict14d и scenario14d вернули недостаточность данных с `result:null`; короткий период не подменил две недели.
+
+Явный available scenario завершился для каждого preset. Ниже **модельные** результаты короткого архива при объявленных cost/impact assumptions и отсутствующих live gates, не доходность полного 14-дневного периода и не реальные сделки:
+
+| USD банк / вход | Модельный trading net PnL, USD | Конечный cash, USD | Max drawdown, USD |
+|---|---:|---:|---:|
+| 150 / 10 | -0.25487784 | 149.74512216 | 5.38307349 |
+| 1000 / 50 | -1.38493988 | 998.61506012 | 26.8188826 |
+| 5000 / 250 | -23.33498702 | 4976.66501298 | 137.31269964 |
+
+В каждом прогоне 2 закрытые модельные позиции, 4 отказа повторной entry-проверки, без final unpriced inventory. Проверены точные равенства в единицах 10⁻⁸ USD: cash−initial = net PnL = realized + write-down. No-trade trading PnL=0; economic net остаётся неизвестен. Computation complete и insufficient execution evidence показаны раздельно. Эти наблюдения не доказывают edge и не запускают promotion. Sanitized aggregates и полные разрешённые ответы сохранены только в ignored artifacts; private watchlist не использовался. Localhost fixture остановлен.
+
+R-025/B-023 завершены для текущей функции исследования и сохранённых отчётов; полный B-009/OOS, paper/live и AI workers остаются отдельной невыполненной работой. CI code `c393098` прошёл; финальная документация добавляет это observed evidence.
+
+Независимый audit координатора через Python Decimal дополнительно подтвердил для всех presets: сумму trade realized и costs против report totals, сумму partial proceeds против trade proceeds и closed proceeds−entryCost против realized PnL. У всех трижды проверенных сценариев 2 trades, без truncation, профиль ENTRY65_DEX и `fullWindow=false`.

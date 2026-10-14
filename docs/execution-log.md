@@ -206,7 +206,7 @@ Report `1df3a9194573e8ba7ea761395e9175f9006349b0bffeb4fa12f40b2134ce8b9b`, datas
 
 ## E-024 — 14 октября 2026: упрощение кабинета (R-028/B-026)
 
-Статус: IN_PROGRESS. Пользователь запросил более простой интерфейс `/bot`, похожий на `/crypto`, с меньшим количеством текста. Astra ведёт реализацию; отдельный UI агент владеет только `web/index.html`, `web/app.js`, `web/styles.css`; второй агент выполняет read-only review. Parent независимо проверяет браузер и backend tests. Настоящие исследования, сделки, источники и параметры evaluator не перезапускаются и не меняются.
+Статус: DONE — опубликованный UI инкремент. Пользователь запросил более простой интерфейс `/bot`, похожий на `/crypto`, с меньшим количеством текста. Astra ведёт реализацию; отдельный UI агент владеет только `web/index.html`, `web/app.js`, `web/styles.css`; второй агент выполняет read-only review. Parent независимо проверяет браузер и backend tests. Настоящие исследования, сделки, источники и параметры evaluator не перезапускаются и не меняются.
 
 Повторная проверка хоста перед изменениями: `/bot/api/health` вернул `web-ad69db38683459e3`, live/paper false; три публичных web assets побайтово совпали с reviewed baseline `928a484`; `/crypto/` доступен, root `/api/session` отвечает 401 без сессии. Подготовлен отдельный bot-only deploy: allowlist трёх assets и RELEASE, два hash preconditions, backup/rollback и проверка точных HTTP bytes/marker после restart. Account SQLite, root auth и ACS application files не затрагиваются.
 
@@ -219,3 +219,11 @@ Report `1df3a9194573e8ba7ea761395e9175f9006349b0bffeb4fa12f40b2134ce8b9b`, datas
 
 
 Финальная независимая browser QA: PASS. На ширине 390 px нет горизонтального переполнения; бюджет и задача сохраняются после refresh, диалог без wallet provider не запрашивает подпись. Все 48 строк доступны через фильтры; длинные метаданные раскрываются, денежные 9 полей сохранены (4 открыто, 5 в подробностях). Старые ссылки каждого типа выбирают правильную вкладку; смешанные IDs и переход прогон → сравнение → прогон сохраняют явный экран после reload. Реальные финансовые расчёты и production аккаунты в этих тестах не использовались.
+
+
+Публикация: commit `c7b2f6e`, оба CI завершились успешно (`38544751088`, `38544745479`). Job `cryptobot-web-20261014094608` завершился с rc=0 в 09:50:35 UTC, активирован release `web-a737c84b1051a52b`. Reviewed base и текущий marker совпали до записи; backup четырёх затронутых файлов сохранён на хосте. Обновлены только HTML, JS, CSS и RELEASE; backend, account DB, root и ACS не менялись. Откат подготовлен, но этому успешному выпуску не потребовался.
+
+Независимый от deployment script HTTP smoke в 09:51:27 UTC: health 200 с точным release, live/paper false; session authenticated=false; bot tasks и root session без cookies отвечают 401; root login и `/crypto/` отвечают 200. Все три served assets совпали с reviewed bytes. SHA-256: HTML `6b59795d15ef4d4ac9e07e71a7b4f548f7ab553bf64fbe7b69ef20848171b1c9`, JS `643ad0d7e3a6788f3f7b06ac086ca9f78b040df19846beafb76354a55ba46654`, CSS `2527c11f0a10bbd10a540bff88026d20902000fed292a9f7dec89019b650f18a`. Manifest, job output, smoke JSON и финальные снимки локального synthetic UI сохранены только в ignored artifacts. Положительный production login и реальная wallet-подпись не проверялись; текущий визуальный выпуск не добавляет полномочий или торговых результатов.
+
+
+Parent повторно независимо подтвердил production release и все три HTTP hashes. Реальный браузер показывает новую шапку, вкладки и корректный logged-out gate; return URL сохраняет `researchView`, console errors отсутствуют. R-028/B-026 закрыты только для упрощения интерфейса; остальные исследовательские и исполнительные требования не повышены до DONE.

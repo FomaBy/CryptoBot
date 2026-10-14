@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "cryptobot.replay.envelope.v1",
+  "studyId": "acs-full-history-causal-20261009-v1",
+  "registeredAt": "2026-10-09T18:18:10.000Z",
+  "reason": "User requests replay of all retained statistics without knowing later observations",
+  "chainId": 4663,
+  "scope": "all retained ACS observations before cutoff; historical Pons membership; frozen entry rules select trades",
+  "end": "2026-10-09T18:16:00.000Z",
+  "previousEnd": "2026-10-09T17:21:00.000Z",
+  "previousDatasetId": "abee8f6b9c4d6e27732d59cb17a2c44b8a9f3d51f6a915104bbda44005906d15",
+  "sourceRevision": "931d0b86f415580c43d3bba7ae1732d362ebc877",
+  "evaluatorHash": "74994218cc539d214afc7316a70a93156f84c26d4b608a3f942de3cc895fc738",
+  "profiles": [
+    {"id": "champion", "rating": 65, "exit": "C", "entryDelaySec": 5},
+    {"id": "historical_challenger", "rating": 75, "exit": "FIXED", "entryDelaySec": 5}
+  ],
+  "presets": [150, 1000, 5000],
+  "scenarios": ["base", "stress"],
+  "evaluations": {"full": 12, "previousPrefixValidation": 12, "search": 0},
+  "costs": {"feePct": "1", "taxPct": "10", "slippagePct": "1", "gasUsd": "0.03", "impact": "qliq_proxy", "actualHistoricalFeesVerified": false},
+  "stress": {"liquidityMultiplier": 0.5, "slippageMultiplier": 2, "additionalEntryDelaySec": 10, "additionalExitDelaySec": 10},
+  "guards": ["global MIN timestamp must fit unchanged 14-day reader or abort before evaluations", "global counts and selected reader counts must agree", "any token or row cap aborts before evaluations", "previous prefix dataset hash must match", "past entries and sales invariant when later rows are appended", "terminal write-downs and resampled equity excluded from prefix invariance", "all 24 frozen evaluations retained", "no changes to evaluator costs or risk caps", "no current survivor list or future ROI selection"],
+  "dataStatus": "old archive already inspected; incremental history descriptive not untouched OOS",
+  "futureOosNotBefore": "2026-10-09T19:26:31.931Z",
+  "limits": {"candidateTokens": 500, "selectedRows": 250000, "wallTimeSec": 100, "paidCalls": 0},
+  "promotionAuthorized": false,
+  "executionAuthorized": false
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "cryptobot.optimization.envelope.v1",
+  "studyId": "acs-entry65-exploratory-20261009-v1",
+  "registeredAt": "2026-10-09T17:55:00.000Z",
+  "chainId": 4663,
+  "scope": "Pons V1/V2 historical observations only",
+  "requestedFrom": "2026-09-25T17:21:00.000Z",
+  "end": "2026-10-09T17:21:00.000Z",
+  "expectedBaselineDatasetId": "abee8f6b9c4d6e27732d59cb17a2c44b8a9f3d51f6a915104bbda44005906d15",
+  "sourceBaselineRevision": "9204180b4497c355bde2e7fdf441d081e0a2b255",
+  "dataStatus": "already_inspected_exploratory_not_holdout",
+  "grid": {
+    "ratings": [65, 75],
+    "exits": ["C", "FIXED"],
+    "entryDelaysSec": [5, 15],
+    "presets": [150, 1000, 5000],
+    "scenarios": ["base", "stress"],
+    "candidateCount": 8,
+    "trialCount": 48
+  },
+  "champion": {"rating": 65, "exit": "C", "entryDelaySec": 5},
+  "exitDefinitions": {
+    "C": "Existing ENTRY65_DEX C plan: stop40% before first sale, time30m,75% original at1.5x, remainder2x/trail20%/15m after first sale",
+    "FIXED": "Existing E65_PLAN: full-position stop40%, time60m, take-profit2x"
+  },
+  "costsUnchanged": {"feeBpsPerSide": 100, "taxBpsPerSide": 1000, "slippageBpsPerSide": 100, "gasUsdPerTransaction": "0.03", "historicalActualFeesVerified": false},
+  "stress": {"liquidityMultiplier": 0.5, "slippageMultiplier": 2, "additionalEntryDelaySec": 10, "additionalExitDelaySec": 10},
+  "invariants": ["same frozen dataset for all trials", "historical first-observed causal signals", "unchanged safety guards and risk caps", "one first edge per token", "fixed-point USD ledger", "all failed zero and truncated trials retained", "no paid providers or new market calls", "baseline exact regression before actual trials", "independent evaluator review before actual trials"],
+  "selection": {
+    "eligibility": "All six preset/scenario results complete, nonfailed, and at least one closed position each",
+    "rank": ["minimum netPnl/initial across all six descending", "maximum drawdown/initial across all six ascending", "candidateId ascending"],
+    "selectOnlyIf": "minimum netPnl strictly positive and zero unpriced positions in all six results",
+    "otherwise": "no_trade_preferred",
+    "promotionAuthorized": false
+  },
+  "diagnostics": ["net realized write-down and modeled costs", "accounting price contribution = net + costs, not frictionless rerun", "actual entry and final exit delays", "holding times", "identical fill-path behavior hashes", "no-trade PnL zero"],
+  "futureOos": {"status": "not_started", "embargoSec": 4500, "eligibleAfterRule": "actual selection time plus embargo", "alreadyViewedDataExcluded": true, "paperRequiredBeforePromotion": true},
+  "limits": {"candidateTokens": 500, "selectedRows": 250000, "evaluations": 48, "concurrentWorkers": 1, "paidProviderCalls": 0},
+  "executionAuthorized": false
+}

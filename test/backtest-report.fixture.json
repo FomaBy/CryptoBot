@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "acs.backtest.v1",
+  "source": {
+    "id": "ai-crypto-statistics",
+    "revision": "0000000000000000000000000000000000000000"
+  },
+  "chainId": 4663,
+  "mode": "scenario",
+  "window": "available",
+  "preset": 150,
+  "period": {
+    "requestedFrom": "2026-09-25T17:10:00.000Z",
+    "from": "2026-10-09T16:10:00.000Z",
+    "end": "2026-10-09T17:10:00.000Z"
+  },
+  "computationStatus": "complete",
+  "status": "insufficient_evidence",
+  "datasetId": "9ea6c4f065d4b25723741fbf6dc6c1ab764f869f994165da68f229cb673a411c",
+  "coverage": {
+    "rows": 6,
+    "selectedRows": 6,
+    "totalRows": 6,
+    "tokens": 1,
+    "totalTokens": 1,
+    "excludedTokens": 0,
+    "firstAt": "2026-10-09T16:10:00.000Z",
+    "lastAt": "2026-10-09T16:10:25.000Z",
+    "daily": [
+      {
+        "day": "2026-10-09",
+        "rows": 6,
+        "tokens": 1,
+        "rated": null,
+        "priced": null,
+        "liquid": null
+      }
+    ],
+    "rated": 6,
+    "priced": 6,
+    "liquid": 6,
+    "truncated": false,
+    "fullWindow": false,
+    "maxGapSec": 5,
+    "missingDays": [
+      "2026-09-25",
+      "2026-09-26",
+      "2026-09-27",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-01",
+      "2026-10-02",
+      "2026-10-03",
+      "2026-10-04",
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08"
+    ],
+    "reasons": [
+      "profile_gates_unavailable",
+      "window_incomplete"
+    ],
+    "selection": "historical_entry_candidates_before_outcomes",
+    "metricsBasis": "selected_pons_observations",
+    "maxRows": 250000,
+    "maxTokens": 500
+  },
+  "assumptions": {
+    "strategy": "ENTRY65_DEX",
+    "profile": {
+      "id": "ENTRY65_DEX",
+      "role": "champion",
+      "entry": {
+        "kind": "RATING",
+        "route": "G",
+        "launchpad": "pons",
+        "needCanEnter": true,
+        "minScore": 65,
+        "windowSec": 300,
+        "ratingVersions": [
+          2
+        ],
+        "latencySec": 5
+      },
+      "exit": {
+        "kind": "C",
+        "stopPct": 40,
+        "timeMin": 30,
+        "take1X": 1.5,
+        "take1Frac": 0.75,
+        "take2X": 2,
+        "trailPct": 20,
+        "runnerMaxMin": 15
+      },
+      "hard": {
+        "lpPull": true,
+        "scam": true,
+        "vetoAfter": true,
+        "devDump": true,
+        "knife": true,
+        "ban": true
+      },
+      "exitLatencySec": 5,
+      "maxMcapUsd": 100000,
+      "lateMin": 15,
+      "onePerToken": true
+    },
+    "profileVersion": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+    "profileApproximation": true,
+    "unsupportedGates": [
+      "migration_window",
+      "route_state",
+      "never_rules",
+      "lpPull",
+      "scam",
+      "vetoAfter",
+      "devDump",
+      "knife",
+      "ban"
+    ],
+    "costVersion": "acs-scenario-cost-v1",
+    "priceBasis": "recorded_observation",
+    "initialUsd": "150",
+    "entryUsd": "10",
+    "feePct": "1",
+    "taxPct": "10",
+    "slippagePct": "1",
+    "gasUsd": "0.03",
+    "delaySec": 5,
+    "exitDelaySec": 5,
+    "maxGapSec": 600,
+    "maxHoldSec": 1800,
+    "takeProfitPct": "100",
+    "stopLossPct": "40",
+    "impactModel": "qliq_proxy",
+    "maxOpen": 3,
+    "maxExposurePct": "20",
+    "dailyLossUsd": "30",
+    "entryThreshold": 65,
+    "canEnterRequired": true,
+    "ratingVersions": [
+      2
+    ],
+    "maxMarketCapUsd": "100000",
+    "rejectedUnknownPolicy": "deny",
+    "oneEntryPerToken": true,
+    "maxTradesPerDay": 100,
+    "accountLimitsAreScenarioOverlay": true,
+    "scenarioAlgorithm": "acs-offline-entry65-c-v1",
+    "partialFractionBasis": "initial_position",
+    "gasPerSale": true,
+    "runnerClockBasis": "observed_first_partial_fill",
+    "exitFillBasis": "next_observation_after_delay",
+    "monetaryLedger": "USD_1e8_integer",
+    "rounding": "cost_up_proceeds_down",
+    "exitGasReserveUsd": "0.06",
+    "sourceProfileHash": "e3bed3301fdead8a83cd2b934593e178daa49fc1059520887bab3c550a91abe9",
+    "strategyVersion": "0236c055f419e2a5f12bae907b47ee0bef67771496e68fa031a8b9d3e262a4b8",
+    "modelHash": "0236c055f419e2a5f12bae907b47ee0bef67771496e68fa031a8b9d3e262a4b8"
+  },
+  "result": {
+    "initialUsd": "150",
+    "endingCashUsd": "153.26589548",
+    "netPnlUsd": "3.26589548",
+    "realizedPnlUsd": "3.26589548",
+    "unrealizedWriteDownUsd": "0",
+    "conservativeNetPnlUsd": "3.26589548",
+    "economicNetPnlUsd": null,
+    "noTradePnlUsd": "0",
+    "totalCostsUsd": "3.1134666",
+    "maxDrawdownUsd": "2.3174556",
+    "closedTrades": 1,
+    "writeDowns": 0,
+    "rejectedSignals": 0,
+    "skipped": {
+      "pending_at_end": 0
+    },
+    "unpricedPositions": 0,
+    "trades": [
+      {
+        "tokenId": "eip155:4663/erc20:0x1111111111111111111111111111111111111111",
+        "address": "0x1111111111111111111111111111111111111111",
+        "signalAt": "2026-10-09T16:10:00.000Z",
+        "entryAt": "2026-10-09T16:10:05.000Z",
+        "exitDecisionAt": "2026-10-09T16:10:20.000Z",
+        "exitAt": "2026-10-09T16:10:25.000Z",
+        "accountedAt": "2026-10-09T16:10:25.000Z",
+        "entryPriceUsd": "1",
+        "exitPriceUsd": "2.1",
+        "sizeUsd": "10",
+        "entryCostUsd": "10.03",
+        "proceedsUsd": "13.29589548",
+        "realizedPnlUsd": "3.26589548",
+        "writeDownUsd": "0",
+        "reason": "c_take2",
+        "status": "closed",
+        "costsUsd": "3.1134666",
+        "sales": [
+          {
+            "at": "2026-10-09T16:10:15.000Z",
+            "priceUsd": "1.6",
+            "fraction": "0.75",
+            "proceedsUsd": "9.26088979",
+            "costsUsd": "1.29805432"
+          },
+          {
+            "at": "2026-10-09T16:10:25.000Z",
+            "priceUsd": "2.1",
+            "fraction": "0.25",
+            "proceedsUsd": "4.03500569",
+            "costsUsd": "0.58453236"
+          }
+        ]
+      }
+    ],
+    "tradeCount": 1,
+    "tradesTruncated": false,
+    "equity": [
+      {
+        "at": "2026-10-09T16:10:00.000Z",
+        "equityUsd": "150"
+      },
+      {
+        "at": "2026-10-09T16:10:00.000Z",
+        "equityUsd": "150"
+      },
+      {
+        "at": "2026-10-09T16:10:05.000Z",
+        "equityUsd": "147.6825444"
+      },
+      {
+        "at": "2026-10-09T16:10:10.000Z",
+        "equityUsd": "152.3274171"
+      },
+      {
+        "at": "2026-10-09T16:10:15.000Z",
+        "equityUsd": "152.29807105"
+      },
+      {
+        "at": "2026-10-09T16:10:20.000Z",
+        "equityUsd": "153.26589548"
+      },
+      {
+        "at": "2026-10-09T16:10:25.000Z",
+        "equityUsd": "153.26589548"
+      },
+      {
+        "at": "2026-10-09T17:10:00.000Z",
+        "equityUsd": "153.26589548"
+      }
+    ]
+  },
+  "unknowns": [
+    "route_fees_unverified",
+    "sellability_unverified",
+    "registry_unverified",
+    "depth_is_qliq_proxy",
+    "upstream_observed_times_unknown",
+    "historical_code_versions_unknown",
+    "migration_window_unknown",
+    "hard_exit_events_unavailable",
+    "never_rules_unavailable",
+    "infrastructure_costs_unknown",
+    "coverage_does_not_prove_no_gaps"
+  ],
+  "executionAuthorized": false,
+  "reportId": "afbe014c99ece1330427a812a8f2b1626866cbef3bb9e97e39a52cdf996bc1ba",
+  "generatedAt": "2026-10-09T17:10:57.512Z"
+}

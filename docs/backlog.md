@@ -48,3 +48,9 @@
 |---|---|---|---|
 | B-024 / P1 | Конечный preregistered перебор ACS и аккаунтный отчёт. R-026 | DONE / B-023; E-022 | Frozen envelope до расчётов, независимый evaluator review, все 48 trials, baseline regression, причинность/ledger/isolation tests, UI и observed deployment. Не завершает B-009, B-014–019. |
 | B-025 / P1 | Повтор всего retained archive с замороженными champion/challenger. R-027 | DONE / B-024; E-023 | Preregistered cutoff/profiles; global earliest/universe/caps audit; prefix invariance; все 12+12 numerical reports, unchanged evaluator; результаты и пределы исторического покрытия. Новый runtime/deploy не требуется. |
+
+## Упрощение интерфейса
+
+| ID / приоритет | Работа | Статус / зависимости | Evidence выхода |
+|---|---|---|---|
+| B-026 / P1 | Компактный кабинет в визуальном стиле ACS. R-028 | IN_PROGRESS / B-013,022–024 | Светлый UI, короткие действия и раскрываемые подробности; сохранение действий и deeplinks, финансовых ограничений; browser QA, существующие native tests, точечный bot-only deploy и production hashes. Без изменения backend/evaluator или повторных исследований. |

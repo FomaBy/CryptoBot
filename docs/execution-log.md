@@ -202,3 +202,20 @@ Job `cryptobot-full-replay-20261009182132`: start 18:25:38Z, rc0 end 18:25:46Z. 
 Report `1df3a9194573e8ba7ea761395e9175f9006349b0bffeb4fa12f40b2134ce8b9b`, dataset `4e4e070dd298d949fd407a5a7085018630c40bd4515be88d2670f070dc2c64fe`. Полные отчёт и job output сохранены только в ignored artifacts с mode0600. Никакие прежние результаты, cohort, credentials или application files не перезаписаны. R-027/B-025 завершены для этого запроса; source timestamp/coverage/fees/depth/live-guards limitations остаются.
 
 Независимый итоговый audit: report content hash совпал; mode0600 подтверждён; Python Decimal перепроверил все 24 cash/realized/write-down/cost ledgers и sale proceeds. Проверены signal<entry, entry<sale, exitDecision<exit; независимо извлечённые 12 prefix event sets совпали. Все старые prefix metrics совпали с предыдущим 48-trial report. Production health остался `web-ad69db38683459e3`, live/paper false. Новый deployment не выполнялся и не требовался.
+
+
+## E-024 — 14 октября 2026: упрощение кабинета (R-028/B-026)
+
+Статус: IN_PROGRESS. Пользователь запросил более простой интерфейс `/bot`, похожий на `/crypto`, с меньшим количеством текста. Astra ведёт реализацию; отдельный UI агент владеет только `web/index.html`, `web/app.js`, `web/styles.css`; второй агент выполняет read-only review. Parent независимо проверяет браузер и backend tests. Настоящие исследования, сделки, источники и параметры evaluator не перезапускаются и не меняются.
+
+Повторная проверка хоста перед изменениями: `/bot/api/health` вернул `web-ad69db38683459e3`, live/paper false; три публичных web assets побайтово совпали с reviewed baseline `928a484`; `/crypto/` доступен, root `/api/session` отвечает 401 без сессии. Подготовлен отдельный bot-only deploy: allowlist трёх assets и RELEASE, два hash preconditions, backup/rollback и проверка точных HTTP bytes/marker после restart. Account SQLite, root auth и ACS application files не затрагиваются.
+
+Для UI QA поднят только loopback preview с отдельной синтетической account identity и временным SQLite. Shared token fixture и historical scenario fixture синтетические; сохранённый optimization fixture также тестовый. Это не production login, не новый фактический исторический прогон и не проверка реального расширения кошелька. Parent независимо выполнил существующие 31 native tests: PASS.
+
+
+Локальный UI переработан в компактную светлую шапку и горизонтальную навигацию. Бюджет и основные действия расположены первыми; пустые торговые метрики убраны из обзора, состояние системы раскрывается по запросу. В стратегии отдельные вкладки прогона, сравнения и токенов; `researchView` фиксирует явный выбор, а старые ссылки `run`, `studyRun`, `analysis` сохраняют начальный fallback. Подробности периода, версий, расходов и ledger доступны в раскрытиях. Расходы модели, отсутствие реальной торговли и границы ownership proof остаются видимыми.
+
+Независимый read-only review подтвердил сохранение всех прежних DOM IDs, отсутствие дублей и неразрешённых label/ARIA references; API signatures и обработчики финансовых/аккаунтных действий не изменены. Семь случаев выбора researchView и переключения проверены изолированно; unsafe HTML insertion не добавлен. JS, Python и встроенный Bash прошли syntax checks; workspace verification: 5 skills, 21 pinned files, 16 documents. UI агент проверил desktop 1400, tablet 700 и mobile 390 без горизонтального переполнения или JS errors. Parent проверяет финальные saved-report flows перед публикацией.
+
+
+Финальная независимая browser QA: PASS. На ширине 390 px нет горизонтального переполнения; бюджет и задача сохраняются после refresh, диалог без wallet provider не запрашивает подпись. Все 48 строк доступны через фильтры; длинные метаданные раскрываются, денежные 9 полей сохранены (4 открыто, 5 в подробностях). Старые ссылки каждого типа выбирают правильную вкладку; смешанные IDs и переход прогон → сравнение → прогон сохраняют явный экран после reload. Реальные финансовые расчёты и production аккаунты в этих тестах не использовались.
